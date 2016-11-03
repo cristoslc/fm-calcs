@@ -1,0 +1,54 @@
+/**
+# x.subscriptException.exists
+ - Performs a check to see if `Get ( ScriptResult )` included an encoded subscriptException.
+ - If a subscriptException is found, sets local variables with relevant data.
+
+## RETURNS
+ - Boolean TRUE or FALSE, depending on whether a subscriptException was found.
+
+## PARAMETERS
+ - none
+
+## USAGE
+```
+If [ x.subscriptException.exists ]
+    # Do this if there is a subscriptException
+End If
+```
+
+## REQUIRES
+ - `#Get()`
+ - `#GetNameList()`
+ 
+## CHANGELOG
+### v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~scriptResult = Get ( ScriptResult )
+;	~resultKeyList = #GetNameList ( ~scriptResult )
+;	~isHasSubscriptExceptionKey = GetAsBoolean 
+	(	Position ( ¶ & ~resultKeyList & ¶ ; ¶ & "subscriptException" & ¶ ; 0 ; 1 )
+	)
+;	~subscriptException = Case 
+	(	~isHasSubscriptExceptionKey
+	;		#Get ( ~scriptResult ; "subscriptException" )
+	)
+
+;	~isHasSubscriptException = GetAsBoolean
+	(	~isHasSubscriptExceptionKey
+		and not ( IsEmpty ( ~subscriptException ) )
+		and not ( Left ( ~subscriptException ; 1 ) = "?" )
+	)
+
+	/** Set the necessary local variables. **/
+;	~value = Let (
+	[	$x.subscriptException = ~subscriptException
+	]
+	;	~isHasSubscriptException
+	)
+]
+;	~value
+)

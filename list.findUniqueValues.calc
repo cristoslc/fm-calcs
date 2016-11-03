@@ -1,0 +1,95 @@
+/** 
+# list.findUniqueValues ( theList ; optional_listOfExceptions )
+ - Given a list of values, some of which may be duplicates,
+ 	get back a list of only the unique values
+ - This function is CASE SENSITIVE
+
+
+## PARAMETERS
+### theList ( text, required )
+ - A carriage return-delimited list of values from which you want 
+ 	to get UNIQUE values only
+### optional_listOfExceptions ( text, optional )
+ - A carriage return-delimited list of values to include even if
+ 	they are duplicated.
+
+## USAGE
+```
+Let (
+[	~myValues = List ( "A" ; "B" ; "C" ; "C" ; "D" ; "A" ; "B" ; "C" )
+;	~uniqueValues = list.findUniqueValues ( ~myValues ; "C" )
+]
+//	RESULT
+;	~uniqueValues // = List ( "A" ; "B" ; "C" ; "C" ; "D" ; "C" ) 
+)
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 Nov 2, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~listValues = theList
+;	~listExceptions = optional_listOfExceptions
+
+;	~maxLengthlistValues = 49999 /** Based on recursion limits, lists longer than this will result in an error. **/
+
+;	~lengthListValues = If 
+	( 	not ( $~list.findUniqueValues__hasStarted )
+	;	 	ValueCount ( ~listValues ) /** Only do this if we're on the first recursion, to save overhead on later recursions. **/
+	/**	ELSE **/
+	;		0
+	) 
+
+;	~listNewValues = Let (
+	[	~pos0 = Position ( ~listValues ; "¶" ; 0 ; 1 ) + 1
+	;	~pos1 = Length ( ~listValues ) + 1
+	;	~length0 = ~pos1 - ~pos0
+	;	~word0 = Case 
+		(	~pos0 > 1
+		;		Middle ( ~listValues ; ~pos0 ; ~length0 ) /** `Middle()` is ever-so-slightly faster than `RightValues()` for this purpose. **/
+		)
+	]
+	;	~word0
+	)
+
+;	~topValue = GetValue ( ~listValues ; 1 ) /** This is no slower than using `Middle()` or `Left()` for this purpose, and is easier to read. **/
+
+;	~valueToCheck = ¶ & ~topValue & ¶ 
+;	~listToCheck = ¶ 
+		& $~list.findUniqueValues__listUniqueValues 
+		& ¶ 
+
+;	~isValueExists = GetAsBoolean ( Position ( ~listToCheck ; ~valueToCheck ; 0 ; 1 ) )
+;	~isValueAnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ~valueToCheck ; 0 ; 1 ) )
+
+;	$~list.findUniqueValues__listUniqueValues = List 
+	(	$~list.findUniqueValues__listUniqueValues
+	;	If 
+		(	not ( ~isValueExists )
+			or ~isValueAnException
+		;		~topValue
+		)
+	)
+
+;	$~list.findUniqueValues__hasStarted = True /** Set a flag so that later recursions know the function's not running for the first time. **/
+]
+;   Case 
+	(	~lengthListValues > ~maxLengthlistValues
+	;		"? Maximum list length is " & ~maxLengthlistValues & " due to recursion limits. Cannot handle a list of " & ~lengthListValues & " items."
+
+	;	not IsEmpty ( ~listNewValues )
+	;		list.findUniqueValues ( ~listNewValues ; ~listExceptions )
+
+	/**	ELSE **/
+	;		$~list.findUniqueValues__listUniqueValues
+	
+	)
+)

@@ -1,0 +1,50 @@
+/**
+# sql.getArrayRowColumn ( sqlData ; rowNumber ; columnNumber )
+ - Get the contents of a specific Row & Column from a SQL result made using `sql.col.delimiter` and `sql.row.delimiter`.
+
+# PARAMETERS
+ - sqlData
+    - The result of a SQL query that was made using `sql.row.delimiter` to separate rows.
+ - rowNumber
+ 	- The number of the row that you want to return.
+ - columnNumber
+ 	- The number of the column you wish to retrieve.
+
+# USAGE
+ - For a situation where:
+ 	- `~sqlQuery = "SELECT nameFirst, nameLast, nameFull FROM Customers"`
+ 	- `$sqlData = ExecuteSQL ( ~sqlQuery ; sql.col.delimiter ; sql.row.delimiter )`
+ - Use the pattern 
+ 	`sql.getArrayRowColumn ( $sqlData ; 1 ; 3 )`
+ 	to return the contents of Row 1, Column 3 from `$sqlData` (e.g., `John Smith`).
+ 
+# REQUIRES
+ - The custom functions `sql.row.delimiter` and `sql.col.delimiter`.
+ - The query that returned `sqlData` MUST have been made using 
+ 	`sql.row.delimiter` to separate rows and `sql.col.delimiter`
+ 	to separate columns.
+ 
+# CHANGELOG
+## v1.0 Sep 28, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let 
+(
+[	~sqlData = sqlData
+;	~rowNumber = rowNumber
+;	~columnNumber = columnNumber
+
+;	~sqlRowData = sql.getArrayRow ( ~sqlData ; ~rowNumber )
+;	~columnValue = sql.getRowColumn ( ~sqlRowData ; ~columnNumber )
+
+;	~value = Case
+	(	Left ( ~sqlRowData ; 1 ) = "?"
+	;		"? Error getting ~rowData: " & ~sqlRowData
+	/**	DEFAULT **/
+	;	~columnValue
+	)
+]
+;	~value
+)

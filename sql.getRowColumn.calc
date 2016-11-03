@@ -1,0 +1,71 @@
+/**
+# sql.getRowColumn ( sqlrowData ; columnNumber )
+ - Pulls the selected columnNumber from sqlRowData, based on the delimiters.
+
+# PARAMETERS
+ - sqlRowData
+    - The result of a SQL query that was made using `sql.col.delimiter` to separate rows.
+ - columnNumber
+ 	- The number of the column you wish to retrieve.
+
+# USAGE
+ - `sql.getRowColumn ( $sqlrowCustomer ; 2 )` 
+ - Returns the value from the SECOND column in `$sqlrowCustomer`.
+ 
+# REQUIRES
+ - The custom function `sql.col.delimiter`.
+ - The query that returned `sqlrowData` MUST have been made using `sql.col.delimiter` to separate rows.
+ 
+# CHANGELOG
+## v1.0 Sep 28, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~sqlRowData = sqlRowData
+;   ~columnNumber = columnNumber
+
+;	~countDelimiters = PatternCount ( ~sqlRowData ; sql.col.delimiter ) 
+;	~isHasDelimiter = GetAsBoolean ( ~countDelimiters )
+;	~openingDelimNumber = ~columnNumber - 1
+
+;	~pos0 = Case 
+	(	~openingDelimNumber = 0
+	;		1
+	/**	ELSE **/
+	;		/** Get the position of the ending character, in case there's a multi-character delimiter. **/
+			Position ( ~sqlRowData ; sql.col.delimiter ; 0 ; ~openingDelimNumber ) + Length ( sql.col.delimiter )
+	)
+
+;	~pos1 = Case
+	(	( /** This is a valid case (e.g., if SQL only returned one row). **/
+			~openingDelimNumber = 0
+			and not ( ~isHasDelimiter )	
+		)
+		/** This is a valid case if the requested row is the last column in the sequence (i.e., there is no terminating delimiter). **/
+		or ( ~openingDelimNumber ≥ ~countDelimiters) 
+	;		Length ( ~sqlRowData ) + 1 /** Add 1 because terminating delimiter is usually 1 character after the end of the target string. **/
+
+	/**	ELSE **/
+	;		Position ( ~sqlRowData ; sql.col.delimiter ; ~pos0 ; 1 ) /** Get the next delimiter after ~pos0. **/
+	)
+
+;	~textLength = ~pos1 - ~pos0
+
+;	~rowText = Middle ( ~sqlRowData ; ~pos0 ; ~textLength )
+
+;   ~value = Case
+    (   /** ERROR HANDLING **/
+        not ( GetAsNumber ( ~columnNumber ) = ~columnNumber )
+    ;       "? columnNumber `" & ~columnNumber & "` is not a valid number."
+    ;	~openingDelimNumber > ~countDelimiters
+    ;		"? User requested column number " & ~columnNumber & " but SQL only returned " & ~countDelimiters + 1 & " columns."
+    ;	~columnNumber = 0
+    ;		"? columnNumber is 1-indexed; cannot return 0th column."
+    /** DEFAULT **/
+    ;       ~rowText
+    )
+]
+;	~value
+)

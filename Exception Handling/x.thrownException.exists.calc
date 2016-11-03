@@ -1,0 +1,25 @@
+/**
+# x.thrownException.exists
+ - Convenience function for accessing common variables in Exception-Handling functions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+If  [ x.thrownException.exists ]
+    # Do something if an Exception was thrown.
+End If
+```
+
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+not IsEmpty ( x.thrownException )

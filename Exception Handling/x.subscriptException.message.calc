@@ -1,0 +1,23 @@
+/**
+# x.subscriptException.message
+ - Convenience function for accessing common variables in Exception-Handling functions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+Show Custom Dialog [ "Error" ; x.subscriptException.message ]
+```
+
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+#Get ( x.subscriptException ; "message" )

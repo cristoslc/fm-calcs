@@ -1,0 +1,23 @@
+/**
+# x.thrownException.message
+ - Convenience function for accessing common variables in Exception-Handling functions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+Show Custom Dialog [ "Error " & x.thrownException.code ; x.thrownException.message ]
+```
+
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+#Get ( x.thrownException ; "message" )

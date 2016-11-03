@@ -1,0 +1,44 @@
+/**
+# x.trapThrownException
+ - Clears all local variables associated with thrown Exceptions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+Loop
+	# Do something that might result in an Exception being thrown.
+
+	If [ x.thrownException.exists ]
+		# Do something with the Exception
+
+		# Clear the thrown Exception for the next loop iteration.
+		Set Variable [ $~temp ; Value: x.trapException ]
+	End If
+
+	# Go to the next loop iteration
+	Set Variable [ $i ; Value: $i + 1 ]
+	Exit Loop If [ $i > $iMax ]
+End Loop
+```
+ 
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Sep 1, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~null = Case ( 0 ; "null" )
+
+;   $x.thrownException = ~null
+;   $x.thrownException.code = ~null
+;   $x.thrownException.message = ~null
+;   $x.thrownException.exists = ~null
+]
+;   True
+)

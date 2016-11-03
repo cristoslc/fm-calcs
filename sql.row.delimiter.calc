@@ -1,0 +1,18 @@
+/**
+# sql.row.delimiter
+ - A high-numbered unicode character sequence that is unlikely to occur in normal conversation, to use as a separator in SQL queries.
+ - This sequence is to separate rows in SQL queries.
+
+# USAGE
+ - `ExecuteSQL ( ~sqlQuery ; sql.col.delimiter ; sql.row.delimiter )`
+
+# CHANGELOG
+## v1.0 2016-09-28
+ - Created by (Cristos Lianides-Chin)[cristos@anchorbuoysoftware.com]
+
+
+ **/
+
+Char ( 9631 ) 
+& "xyzzy"
+& Char ( 9631 )

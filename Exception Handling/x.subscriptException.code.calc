@@ -1,0 +1,25 @@
+/**
+# x.subscriptException.code
+ - Convenience function for accessing common variables in Exception-Handling functions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+If [ x.subscriptException.code = 1015 ]
+	# Do this if trapping specific subscriptException code
+End If
+```
+
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+#Get ( x.subscriptException ; "code" )

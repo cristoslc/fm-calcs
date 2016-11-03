@@ -1,0 +1,88 @@
+/**
+# x.ThrowException ( exCode ; exMessage ; optional_subscriptException )
+ - Creates a serialized dictionary and sets the local variables for an Exception.
+ - If using Single-Pass Loop architecture, `x.ThrowExceptionIf` is more concise and is generally recommended.
+ - If you are just rethrowing a subscriptException, then `x.subscriptException.rethrow` is generally recommended,
+ 	unless you specifically need to modify the Exception code or message.
+
+# PARAMETERS
+## exCode (number)
+ - The code number to include in the Exception.
+## exMessage (text)
+ - The message to include in the Exception.
+## optional_subscriptException (text, optional)
+ - If rethrowing a subscript Exception, include this parameter to capture additional 
+ 	data from the original Exception source.
+
+# USAGE
+```
+If [ Get ( LastError ) ]
+	Set Variable [ ~ ; Value: x.ThrowException ( 2000 ; "Unable to navigate to the correct layout. FileMaker error: " & Get ( LastError ) & "." ) ]
+End If
+```
+
+or
+
+```
+Loop
+	Perform Script [ "Send Invoice to Customer" ]
+	If [ x.subscriptException.exists ]
+		Set Variable [ ~ ; Value: x.ThrowException ( 3000 ; "There was a problem sending the Customer's Invoice." ; x.subscriptException ) ]
+		Exit Loop If [True]
+	End If
+
+	Exit Loop If [ True // Exit single-pass loop. ]
+End Loop
+ 
+# REQUIRES
+ - `#()`
+ - `#GetNameList()`
+
+ 
+# CHANGELOG
+## v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let ([
+	~code = exCode
+;	~message = exMessage
+;	~lastException = optional_subscriptException
+;	~lastExceptionStack = #get ( ~lastException ; "scriptStack" ) 
+;	~lastExceptionStack = Case
+	(	not IsEmpty ( ~lastExceptionStack )
+		and not ( Left ( ~lastExceptionStack ; 1 ) = "?" )
+	;		~lastExceptionStack
+	)
+
+;	~listLastExceptionKeys = #GetNameList ( ~lastException )
+;	~isLastExceptionHasRootException = GetAsBoolean ( Position ( ¶ & ~listLastExceptionKeys & ¶ ; ¶ & "rootException" & ¶ ; 0 ; 1 ) )
+;	~rootException = 
+	Case ( 
+		~isLastExceptionHasRootException ; #get ( ~lastException ; "rootException" ) 
+	;	~lastException
+	)
+
+;	~scriptStack = List 
+	( 	"[" & Get ( FileName ) & "] " & Get ( ScriptName ) 
+	; 	~lastExceptionStack
+	)
+
+
+;	$x.thrownException = 
+		# ( "code" ; ~code )
+	& 	# ( "message" ; ~message )
+	& 	# ( "scriptSection" ; $scriptSection )
+	& 	# ( "scriptStack" ; ~scriptStack )
+	& 	Case 
+		(	IsEmpty ( ~rootException )
+		;		# ( "scriptParameter" ; Get ( ScriptParameter ) )
+		
+		/**	DEFAULT **/
+		;		# ( "rootException" ;	~rootException )
+		)
+];
+
+	$x.thrownException 
+)

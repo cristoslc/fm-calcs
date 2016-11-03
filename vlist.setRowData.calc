@@ -1,0 +1,65 @@
+/**
+# vlist.setRowData ( tableName ; rowNumber ; rowData )
+ - Convenience function for setting the contents of a row in a Virtual List.
+
+# PARAMETERS
+ - <<parameter>>
+    - <<parameter description>>
+
+# USAGE
+ - <<How do you use this function? Include an example with mock data.>>
+ 
+# REQUIRES
+ - <<What are the prerequisites or environmental conditions?>>
+ 
+# CHANGELOG
+## v1.0 Sep 28, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~tableName = tableName
+;	~rowNumber = rowNumber
+;	~rowData = rowData
+
+;	~varName = "$$vlist__" & ~tableName
+
+;	~topIndexNumber = Let (
+	[	~currentTopIndex = #get ( ~varName ; "topIndexNumber" )
+	]
+	;	Case
+		(	~currentTopIndex > ~rowNumber
+		;		~currentTopIndex
+		/**	DEFAULT **/
+		;		~rowNumber
+		)
+	)
+
+;	~expression = "Let ( "
+	& "[ " 	& ~varName & " = #set ( " & ~varName & " ; \"" & ~rowNumber & "\" ; \"" & ~rowData & "\" )"
+	& "; " 	& ~varName & " = #set ( " & ~varName & " ; \"topIndexNumber\" ; " & ~topIndexNumber & ")"
+	& "] "
+	& "; "	& ~varName
+	& ")"
+
+;	~evalExpression = Evaluate ( ~expression )
+;	~evalError = If
+	(	~evalExpression = "?"
+	;		EvaluationError ( ~expression )
+	)
+
+;	~value = Case 
+	(	/** Error Handling **/
+		not ( GetAsNumber ( ~rowNumber ) = ~rowNumber )
+	;		"? rowNumber `" & ~rowNumber & "` is not a valid number."
+	;	dict.getKeyList( ~rowData ) = "?"
+	;		"? rowData does not appear to be a valid dictionary. ¶" & ~rowData
+	;	~evalError > 0
+	;		" ? An evaluation error occurred: " & ~evalError
+	/**	DEFAULT **/
+	;		~evalExpression
+	)
+]
+;	~value
+)

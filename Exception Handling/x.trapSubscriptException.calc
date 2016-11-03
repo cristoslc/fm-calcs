@@ -1,0 +1,44 @@
+/**
+# x.trapSubscriptException
+ - Clears all local variables associated with thrown SubscriptExceptions.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+Loop
+    Perform Script [ "Send Invoice to Customer" ]
+
+    If [ x.subscriptException.exists ]
+        # Do something with the SubscriptException
+
+        # Clear the thrown SubscriptException for the next loop iteration.
+        Set Variable [ $~temp ; Value: x.trapSubscriptException ]
+    End If
+
+    # Go to the next loop iteration
+    Set Variable [ $i ; Value: $i + 1 ]
+    Exit Loop If [ $i > $iMax ]
+End Loop
+```
+ 
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 Sep 1, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~null = Case ( 0 ; "null" )
+
+;   $x.subscriptException = ~null
+;   $x.subscriptException.code = ~null
+;   $x.subscriptException.message = ~null
+;   $x.subscriptException.exists = ~null
+]
+;   True
+)

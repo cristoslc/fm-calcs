@@ -1,0 +1,28 @@
+/**
+# x.__README__
+ - The `x.*` namespace is reserved for Exception-Handling custom functions.
+ - This function contains documentation about the Exception-Handling custom functions.
+
+## PURPOSE
+ - Exception-Handling is a form of error handling that encodes details about an error
+   into a structured data format.
+ - Exceptions are common in other programming languages. These functions enable a developer 
+   to use some Exception Handling patterns in FileMaker.
+ - For more on Exception Handling, see http://cris.lc/fmp-exceptionhandling
+
+## REQUIRES
+ - A data serialization technique, such as SFR dictionaries, Let-notation, or PropertyList.
+ - The following CFs:
+   - `# ( key ; value )`
+     - Encode a key-value pair to add to a serialized dictionary.
+   - `#Get ( dictionary ; key )`
+     - Fetch the value for `key` from a serialized dictionary.
+   - `#GetNameList ( dictionary )`
+     - Gets the list of encoded keys from a serialized dictionary.
+
+
+## CHANGELOG
+### v1.0 2016-09-29
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/

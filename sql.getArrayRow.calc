@@ -1,0 +1,75 @@
+/**
+# sql.getArrayRow ( sqlData ; rowNumber )
+ - Pulls the selected rowNumber from sqlData, based on the delimiters.
+
+# PARAMETERS
+ - sqlData
+    - The result of a SQL query that was made using `sql.row.delimiter` to separate rows.
+ - rowNumber
+ 	- The number of the row that you want to return.
+
+# USAGE
+ - `sql.getArrayRow ( $sqldataCustomers ; 2 )` 
+ - Returns the entire SECOND row from `$sqldataCustomers`.
+ 
+# REQUIRES
+ - The custom function `sql.row.delimiter`.
+ - The query that returned `sqlData` MUST have been made using `sql.row.delimiter` to separate rows.
+ 
+# CHANGELOG
+## v1.0 Sep 28, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~sqlData = sqlData
+;   ~rowNumber = rowNumber
+
+	/** NOTE: If working with very large result sets, may want to disable ~countDelimiters and related error check to improve performance. **/
+;	~countDelimiters = PatternCount ( ~sqlData ; sql.row.delimiter ) 
+	/** NOTE: If working with very large result sets, can use `GetAsBoolean ( Position ( ~sqlData ; sql.row.delimiter ; 0 ; 1 ) )` instead for better performance. **/
+;	~isHasDelimiter = GetAsBoolean ( ~countDelimiters )
+;	~openingDelimNumber = ~rowNumber - 1
+
+;	~pos0 = Case 
+	(	~openingDelimNumber = 0
+	;		1
+	/**	ELSE **/
+	;		/** Get the position of the ending character, in case there's a multi-character delimiter. **/
+			Position ( ~sqlData ; sql.row.delimiter ; 0 ; ~openingDelimNumber ) + Length ( sql.row.delimiter )
+	)
+
+;	~pos1 = Case
+	(	( /** This is a valid case (e.g., if SQL only returned one row). **/
+			~openingDelimNumber = 0
+			and not ( ~isHasDelimiter )	
+		)
+		/** This is a valid case if the requested row is the last row in the sequence (i.e., has no terminating delimiter). **/
+		/** NOTE: May need a workaround if omitting ~countDelimiters due to performance concerns. **/
+		or ( ~openingDelimNumber ≥ ~countDelimiters) 
+	;		Length ( ~sqlData ) + 1 /** Add 1 because terminating delimiter is usually 1 character after the end of the target string. **/
+
+	/**	ELSE **/
+	;		Position ( ~sqlData ; sql.row.delimiter ; ~pos0 ; 1 ) /** Get the next delimiter after ~pos0. **/
+	)
+
+;	~textLength = ~pos1 - ~pos0
+
+;	~rowText = Middle ( ~sqlData ; ~pos0 ; ~textLength )
+
+;   ~value = Case
+    (   /** ERROR HANDLING **/
+        not ( GetAsNumber ( ~rowNumber ) = ~rowNumber )
+    ;       "? rowNumber `" & ~rowNumber & "` is not a valid number."
+    	/** NOTE: If working with very large result sets, may need to disable this error check to improve performance. **/
+    ;	~openingDelimNumber > ~countDelimiters
+    ;		"? User requested row number " & ~rowNumber & " but SQL only returned " & ~countDelimiters + 1 & " rows."
+    ;	~rowNumber = 0
+    ;		"? rowNumber is 1-indexed; cannot return 0th row."
+    /** DEFAULT **/
+    ;       ~rowText
+    )
+]
+;	~value
+)

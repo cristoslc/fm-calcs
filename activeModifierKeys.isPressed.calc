@@ -1,0 +1,38 @@
+/** 
+# activeModifierKeys.isPressed ( keyName )
+ - Returns True if the given key is pressed, or False if not.
+
+
+## PARAMETERS
+### keyName ( text, required )
+ - the name of the key that you want to check
+
+
+## USAGE
+```
+If [ activeModifierKeys.isPressed ( "Shift" ) ]
+	# Do this if the Shift key is pressed.
+End If
+```
+
+ 
+## REQUIRES
+ - `activeModifierKeys.list` custom function
+
+ 
+## CHANGELOG
+### v1.0 Oct 27, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~keyName = ¶ & Lower ( keyName ) & ¶
+;	~listKeys = ¶ & Lower ( activeModifierKeys.list ) & ¶
+
+;	~isKeyPressed = Position ( ~listKeys ; ~keyName ; 0 ; 1 ) > 0
+
+;	~value = ~isKeyPressed
+]
+;	~value
+)

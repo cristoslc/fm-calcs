@@ -1,0 +1,63 @@
+/**
+# x.subscriptException.rethrow ( optional_Code ; optional_Message )
+ - Rethrows a subscript exception as an exception in the current script.
+
+## PARAMETERS
+### optional_Code (number, optional)
+ - defaults to `3000`
+ - A code to use in the ThrownException.
+
+### optional_Message (text, optional)
+ - defaults to `x.subscriptException.message`
+ - A message to include in the newly-thrown Exception. The optional message
+    will prefix the `x.subscriptException.message` but not replace it.
+
+
+## USAGE
+```
+Loop
+    Perform Script [ "Export Customer Invoice to PDF > filePath" ; Parameter: $idCustomerInvoice ]
+    Exit Loop If [ x.subscriptException.rethrow ]
+
+    Exit Loop If [ True // Always exit single-pass loop. ]
+End Loop
+
+If [ x.thrownException.exists ]
+    # Error-handling code goes here.
+End If
+```
+ 
+## REQUIRES
+ - `x.subscriptException`
+ - `x.subscriptException.exists`
+ - `x.ThrowExceptionIf()`
+ 
+## CHANGELOG
+### v1.0 Oct 4, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~message = optional_Message
+;   ~code = optional_Code
+
+;   ~subscriptException.exists = x.subscriptException.exists
+;   ~subscriptException = x.subscriptException
+
+;   ~exMessage = Case 
+    (   IsEmpty ( ~message )
+    ;       x.subscriptException.message
+    /** DEFAULT **/
+    ;       ~message & " (" & x.subscriptException.message & ")"
+    )
+
+;   ~exCode = Case
+    (   IsEmpty ( ~code )
+    ;       3000
+    /** DEFAULT **/
+    ;       ~code
+    )
+]
+;   x.ThrowExceptionIf ( ~subscriptException.exists ; ~exMessage ; ~exCode ; ~subscriptException )
+)

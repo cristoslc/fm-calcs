@@ -1,0 +1,25 @@
+/**
+# x.subscriptException
+ - Convenience function for accessing common variables in Exception-Handling functions.
+ - Provides intellisense-style type-ahead assistance in FileMaker 14+.
+
+# PARAMETERS
+ - none
+
+# USAGE
+```
+#Get ( x.subscriptException ; "newProperty" )
+```
+  - Use when trying to access properties from an Exception without using one of the other convenience functions.
+
+ 
+# REQUIRES
+ - none
+ 
+# CHANGELOG
+## v1.0 2016-09-20
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+$x.subscriptException

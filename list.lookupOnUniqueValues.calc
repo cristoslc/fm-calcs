@@ -1,0 +1,134 @@
+/** 
+# list.lookupOnUniqueValues ( listValuesToReturn ; listValuesToCheckUniqueness ; optional_listOfExceptions )
+ - Given a list of values, some of which may be duplicates,
+    get back a list of only the unique values
+ - This function is CASE SENSITIVE
+
+
+## PARAMETERS
+### listValuesToReturn ( text, required )
+ - A carriage return-delimited list of values you want to get back
+    IFF their accompanying value (in `listValuesToCheckUniqueness`)
+    is unique.
+### listValuesToCheckUniqueness ( text, required )
+ - A carriage return-delimited list of values which you want to check
+    for uniqueness.
+### optional_listOfExceptions ( text, optional )
+ - A carriage return-delimited list of values to include even if
+    they are duplicated.
+
+## USAGE
+```
+Let (
+[   ~valuesToCheckUniqueness = List ( "A" ; "B" ; "C" ; "C" ; "D" ; "A" ; "B" ; "C" )
+;   ~valuesToReturn = List ( "Alpha" ; "Bravo" ; "Charlie" ; "Charlie" ; "Delta" ; "Alpha" ; "Bravo" ; "Charlie" )
+;   ~lookedUpValues = list.lookupOnUniqueValues ( ~valuesToReturn ; ~valuesToCheckUniqueness ; "" )
+]
+//  RESULT
+;   ~lookedUpValues // = List ( "Alpha" ; "Bravo" ; "Charlie" ; "Delta" ) 
+)
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 Nov 2, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~listValuesToCheck = listValuesToCheckUniqueness
+;   ~listValuesToReturn = listValuesToReturn
+;   ~listExceptions = optional_listOfExceptions
+
+;   ~maxLengthlistValues = 49999 /** Based on recursion limits, lists longer than this will result in an error. **/
+
+;   ~lengthListValuesToCheck = If 
+    (   not ( $~list.findUniqueValues__hasStarted )
+    ;       ValueCount ( ~listValuesToCheck ) /** Only do this if we're on the first recursion, to save overhead on later recursions. **/
+    /** ELSE **/
+    ;       0
+    ) 
+
+;   ~lengthListValuesToReturn = If 
+    (   not ( $~list.findUniqueValues__hasStarted )
+    ;       ValueCount ( ~listValuesToReturn ) /** Only do this if we're on the first recursion, to save overhead on later recursions. **/
+    /** ELSE **/
+    ;       0
+    ) 
+
+;   ~listNewValuesToCheck = Let (
+    [   ~pos0 = Position ( ~listValuesToCheck ; "¶" ; 0 ; 1 ) + 1
+    ;   ~pos1 = Length ( ~listValuesToCheck ) + 1
+    ;   ~length0 = ~pos1 - ~pos0
+    ;   ~word0 = Case 
+        (   ~pos0 > 1
+        ;       Middle ( ~listValuesToCheck ; ~pos0 ; ~length0 ) /** `Middle()` is ever-so-slightly faster than `RightValues()` for this purpose. **/
+        )
+    ]
+    ;   ~word0
+    )
+
+;   ~listNewValuesToReturn = Let (
+    [   ~pos0 = Position ( ~listValuesToReturn ; "¶" ; 0 ; 1 ) + 1
+    ;   ~pos1 = Length ( ~listValuesToReturn ) + 1
+    ;   ~length0 = ~pos1 - ~pos0
+    ;   ~word0 = Case 
+        (   ~pos0 > 1
+        ;       Middle ( ~listValuesToReturn ; ~pos0 ; ~length0 ) /** `Middle()` is ever-so-slightly faster than `RightValues()` for this purpose. **/
+        )
+    ]
+    ;   ~word0
+    )
+
+;   ~topValueToCheck = GetValue ( ~listValuesToCheck ; 1 )
+
+;   ~topValueToReturn = GetValue ( ~listValuesToReturn ; 1 )
+
+;   ~valueToCheck = ¶ & ~topValueToCheck & ¶ 
+    /** Check against both the Unique values we've found so far AND the manually-specified exceptions (if any). **/
+;   ~listToCheck = ¶ 
+        & $~list.findUniqueValues__listUniqueValues 
+        & ¶ 
+
+;   ~isValueExists = GetAsBoolean ( Position ( ~listToCheck ; ~valueToCheck ; 0 ; 1 ) )
+;   ~isValueAnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ~valueToCheck ; 0 ; 1 ) )
+
+;   $~list.findUniqueValues__listUniqueValues = List 
+    (   $~list.findUniqueValues__listUniqueValues
+    ;   If 
+        (   not ( ~isValueExists )
+            or ~isValueAnException
+        ;       ~topValueToCheck
+        )
+    )
+
+;   $~list.findUniqueValues__listReturnValues = List 
+    (   $~list.findUniqueValues__listReturnValues
+    ;   If 
+        (   not ( ~isValueExists )
+            or ~isValueAnException
+        ;       ~topValueToReturn
+        )
+    )
+
+;   $~list.findUniqueValues__hasStarted = True /** Set a flag so that later recursions know the function's not running for the first time. **/
+]
+;   Case 
+    (   ~lengthListValuesTocheck > ~maxLengthlistValues
+    ;       "? Maximum list length is " & ~maxLengthlistValues & " due to recursion limits. Cannot handle a list of " & ~lengthListValuesToCheck & " items."
+
+    ;   not ( ~lengthlistvaluesToCheck = ~lengthListValuesToReturn )
+    ;       "? ~listValuesToCheck has " & ~lengthListValuesToCheck & " items, but ~listValuesToReturn has " & ~lengthListValuesToReturn & " items. Both lists must have the same number of items."
+
+    ;   not IsEmpty ( ~listNewValuesToCheck )
+    ;       list.lookupOnUniqueValues ( ~listNewValuesToReturn ; ~listNewValuesToCheck ; ~listExceptions )
+
+    /** ELSE **/
+    ;       $~list.findUniqueValues__listReturnValues
+    )
+)

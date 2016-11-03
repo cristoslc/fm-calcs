@@ -1,0 +1,25 @@
+/**
+# activeModifierKeys.list
+ - returns a list of keys held by user (Shift, Caps Lock, Ctrl/Control, Alt/Option, Command)
+
+# CHANGELOG
+## v1.1 2016-10-27
+ - modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com)
+ - adapted for multiplatform use (by adding OS X key names to returned list )
+ - namespaced locally-scoped variables (`$`) to avoid potential conflicts in running scripts
+
+## v1.0 May 18th, 2008
+ - created by Fabrice Nordmann (http://www.briandunning.com/cf/846)
+**/
+
+Let (
+[	$~activeModifierKeys.list__x = Get ( ActiveModifierKeys )
+;	t = Case ( $~activeModifierKeys.list__x >= 16 ; Let ([ $~activeModifierKeys.list__r = "Command" ; $~activeModifierKeys.list__x = $~activeModifierKeys.list__x - 16 ]; "" ))
+;	t = Case ( $~activeModifierKeys.list__x >= 8 ; Let ([ $~activeModifierKeys.list__r = List ( $~activeModifierKeys.list__r ; "Alt" ; "Option" ) ; $~activeModifierKeys.list__x = $~activeModifierKeys.list__x - 8 ]; "" ))
+;	t = Case ( $~activeModifierKeys.list__x >= 4 ; Let ([ $~activeModifierKeys.list__r = List ( $~activeModifierKeys.list__r ; "Ctrl" ; "Control" ) ; $~activeModifierKeys.list__x = $~activeModifierKeys.list__x - 4 ]; "" ))
+;	t = Case ( $~activeModifierKeys.list__x >= 2 ; Let ([ $~activeModifierKeys.list__r = List ( $~activeModifierKeys.list__r ; "Caps Lock" ) ; $~activeModifierKeys.list__x = $~activeModifierKeys.list__x - 2 ]; "" ))
+;	t = Case ( $~activeModifierKeys.list__x = 1 ; Let ([ $~activeModifierKeys.list__r = List ( $~activeModifierKeys.list__r ; "Shift" )] ; "" ))
+]
+;	$~activeModifierKeys.list__r 
+	& Let ( $~activeModifierKeys.list__r = "" ; "" )
+)

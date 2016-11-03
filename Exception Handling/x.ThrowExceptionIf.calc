@@ -1,0 +1,55 @@
+/**
+# x.ThrowExceptionIf ( exCondition ; exCode ; exMessage ; optional_subscriptException )
+ 
+
+## RETURNS
+ - If a boolean condition is TRUE, throws an Exception with the supplied parameters and returns it. 
+ - Otherwise, returns null.
+
+
+## PARAMETERS
+### exCondition
+ - The condition to test to see whether or not an Exception should be thrown.
+
+### exCode
+ - The code number to include in the Exception.
+
+### exMessage
+ - The message to include in the Exception.
+
+
+## USAGE
+```
+Loop
+	Go to Layout [ "Customers" ]
+	Exit Loop If [ x.ThrowExceptionIf ( Get ( LastError ) > 0 ; 2000 ; "Unable to navigate to Customrs Layout. FileMaker error: " & Get ( LastError ) & "." ) ]
+
+	# Do stuff on the Customers layout
+
+	Exit Loop If [ True // Exit single-pass loop. ]
+End Loop
+```
+ 
+
+## REQUIRES
+ - `x.ThrowException()`
+ 
+
+## CHANGELOG
+### v1.0 Oct 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+Let (
+[   ~code = exCode
+;   ~message = exMessage
+;   ~condition = exCondition
+;	~lastException = optional_subscriptException
+]
+;   If 
+    (   GetAsBoolean ( ~condition )
+    ;       x.ThrowException ( ~code ; ~message ; ~lastException )
+    )
+)

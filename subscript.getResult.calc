@@ -1,0 +1,45 @@
+/**
+# subscript.getResult ( name )
+ - Convenience function for getting a specific value from a 
+ 	subscript that returned a Let-notation dictionary for  result.
+
+# PARAMETERS
+ - name
+ 	- The name of the key you wish to retrieve.
+
+# USAGE
+ - As follows, after using a `Perform Script` script step:
+ 
+ ```
+ Perform Script [ "Export Customer Invoice > fileName" ; Parameter: $idCustomer ]
+ Set Variable [ $fileName ; Value: #getSubscriptResult ( "fileName" ) ]
+ ```
+ 
+# REQUIRES
+ - The subscript (in the above example, `Export Customer Invoice > fileName`) must
+ 	return a Let-notation dictionary that includes an entry named `subscriptResult`.
+ - The parameter you are trying to access must be inside the `subscriptResult` entry.
+ 	E.g., it must be encoded like:
+ 	
+ 	```
+ 	Exit Script [ # ( "subscriptResult" ; # ( "fileName" ; $fileName ) ) ]
+ 	```
+ 
+# CHANGELOG
+## v1.0 Oct 4, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+
+Let (
+[	~keyName = name
+;	~scriptResult = #Get ( Get ( ScriptResult) ; "subscriptResult" )
+
+;	~keyValue = #Get ( ~scriptResult ; ~keyName )
+
+;	~value = ~keyValue
+]
+;	~value
+)

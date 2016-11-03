@@ -1,0 +1,75 @@
+/**
+# vlist.GetVirtualFieldContents ( fieldFqName ; rowNumber )
+ - Generic function for grabbing the contents of a VirtualList 
+ 	field from a specifically-configured global variable.
+
+# PARAMETERS
+ - fieldFqName
+ 	- The fully-qualified name of the field you wish to populate.
+
+# USAGE
+ - If you are using a STORED calculation for your record number, use:
+  `vlist.GetVirtualFieldContents ( GetFieldName ( Self ) ; <<recordNumberCalcField>> )`
+ - Otherwise, put:
+  `vlist.GetVirtualFieldContents ( GetFieldName ( Self ) ; Get ( RecordNumber ) )`
+ - In both cases, the field that calls this function should be 
+  an UNSTORED calculation field.
+ 
+# REQUIRES
+ - Let-notation functions (`#()`, `#Get()`, `#GetNameList()`, etc.)
+ - Global vars must follow the naming convention 
+ 	`$$vlist__virtualListTableName`, e.g., `$$vlist__zz_salesReportVirtualList` where
+ 	the table is named `zz_salesreportVirtualList`.
+ - Global vars must contain a Let-dictionary, in which:
+ 	- Each first-level key corresponds to a row number.
+	- Each first-level value is actually a Let-dictionary of its own, 
+	  in which the keys correspond to the field names in the VirtualList table.
+	- For example, the contents of `$$zz_virtualListTableName` might be:
+
+		```
+		$1 = "$field1 = \"Alpha\" ;¶$field2 = \"Bravo\" ;¶" ;
+		$2 = "$field1 = \"Charlie\" ;¶$field2 = \"Delta\" ;¶" ;
+		```
+
+		which comes from the pattern:
+
+		```
+		# ( "<<rowNumber>>" ; # ( "<<fieldName>>" ; "<<fieldValue>>" ) )
+		```
+
+# CHANGELOG
+## v1.0 2016-09-28
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~fieldFqName = fieldFqName
+;	~rowNumber = rowNumber
+
+;	~fieldFqNameList = Substitute ( ~fieldFqName ; [ "::" ; "¶" ] )
+;	~tableName = GetValue ( ~fieldFqNameList ; 1 )
+;	~fieldName = GetValue ( ~fieldFqNameList ; 2 )
+
+;	~varName = "$$vlist__" & ~tableName
+;	~fullDict = Evaluate ( ~varName )
+
+;	~rowDict = #Get ( ~fullDict ; ~rowNumber )
+;	~fieldValue = #Get ( ~rowDict ; ~fieldName )
+
+;	~value = Case 
+	(	/** ERROR CHECKING **/
+		not ( Position ( ~fieldFqName ; "::" ; 0 ; 1 ) )
+	;		"? Supplied parameter, `" & ~fieldFqName & "`, was not a fully-qualified field name."
+	;	not ( Position ( ¶ & #GetNameList ( ~fullDict ) & ¶ ; ¶ & ~rowNumber & ¶ ; 0 ; 1 ) ) /** Check the key list, DON'T use `IsEmpty()`, because an empty value might be valid. **/
+	;		"? The row `" & ~rowNumber & "` could not be found in `" & ~varName & "`."
+	;	not ( Position ( ¶ & #GetNameList ( ~rowDict ) & ¶ ; ¶ & ~fieldName & ¶ ; 0 ; 1 ) ) /** Check the key list, DON'T use `IsEmpty()`, because an empty value might be valid. **/
+	;		"? The field `" & ~fieldName & "` could not be found in ~rowDict."
+	/**	DEFAULT **/
+		/** Return the value from the inner dictionary. **/
+	;		~fieldValue
+	)
+
+]
+;	~value
+)
