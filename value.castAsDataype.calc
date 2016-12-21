@@ -1,0 +1,63 @@
+/** 
+# value.castAsDatatype ( rawValue ; datatype )
+ - What is the purpose of this function, in a sentence or two?
+
+
+## PARAMETERS
+### rawValue ( any, required )
+ - The raw value you want to cast as a specific datatype.
+### datatype ( text, required )
+ - The datatype into which you want to cast the raw value. Must be one of:
+   - text
+   - number
+   - date
+   - time
+   - timestamp
+
+
+
+## USAGE
+```
+List 
+(	value.castAsDatatype ( "10" ; "number" ) < 2 // returns False
+;	value.castAsDatatype ( 10 ; "text" ) < 2 // returns True
+)
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 7, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~rawValue = rawValue
+;   ~datatype = Lower ( datatype )
+
+;   ~returnValue = Case 
+    (   ~datatype = "text"
+    ;       GetAsText ( ~rawValue )
+
+    ;   ~datatype = "number"
+    ;       GetAsNumber ( ~rawValue )
+
+    ;   ~datatype = "date"
+    ;       GetAsDate ( ~rawValue )
+
+    ;   ~datatype = "time"
+    ;       GetAsTime ( ~rawValue )
+
+    ;   ~datatype = "timestamp"
+    ;       GetAsTimestamp ( ~rawValue )
+
+    /** DEFAULT **/
+    ;       "? - Unrecognized datatype, `" & ~datatype & "`."
+    )
+]
+;   ~returnValue
+)

@@ -1,0 +1,43 @@
+/** 
+# value.isEmptyOrError ( valueToCheck )
+ - Checks a given value (variable, calculation result, or field) to see if it's empty
+ 	or if it begins with "?"
+
+
+## PARAMETERS
+### valueToCheck ( required )
+ - The value you want to check.
+
+
+## USAGE
+```
+Set Variable [$receiptTotal; Value: CF_calculateReceiptTotal ( Receipts::id_receipt )] // e.g., where CF uses SQL to get the receipt total
+If [value.isEmptyOrError ( $receiptTotal )]
+	# Error-handling code if you don't get back an expected result.
+End If
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 Nov 16, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~valueToCheck = valueToCheck
+
+;	~isValueEmpty = IsEmpty ( ~valueToCheck )
+;	~isValueError = Exact ( Left ( ~valueToCheck ; 1 ) ; "?" )
+
+;   ~returnValue = GetAsBoolean
+	(	~isValueEmpty
+		or ~isValueError
+	)
+]
+;   ~returnValue
+)

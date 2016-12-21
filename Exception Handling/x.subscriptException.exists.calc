@@ -35,6 +35,7 @@ Let (
 ;	~subscriptException = Case 
 	(	~isHasSubscriptExceptionKey
 	;		#Get ( ~scriptResult ; "subscriptException" )
+			& # ( "subscriptResult" ; ~scriptResult )
 	)
 
 ;	~isHasSubscriptException = GetAsBoolean

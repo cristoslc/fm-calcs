@@ -1,0 +1,83 @@
+/** 
+# list.getPartialMatches ( listOfValues ; searchText )
+ - Returns a list of values from `listOfValues` that at least partially contain the string in `searchText`.
+ - This function is CASE-SENSITIVE.
+ - This is a tail-recursive function, subject to the recursion limit of 50,000 tail recursions (including 
+ 	the first one) in FileMaker 15.
+
+## PARAMETERS
+### listOfValues ( text, required )
+ - The list of values that you want to check for `searchText`.
+### searchText ( text, required )
+ - The text string to locate in each value of `listOfValues`.
+
+
+## USAGE
+```
+list.getPartialMatches ( "Category 'Red Fruit' includes:¶¶Apples¶Beets¶Cherries" ; "es" )
+```
+ - This example returns the list `"Category 'Red Fruit' includes:¶Apples¶Cherries"`.
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 14, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~listValues = listOfValues
+;	~searchText = searchText
+
+/** Isolate the first value in the list. Using `GetValue()` towards the top of the list does not detract from performance. **/
+;	~valueToCheck = GetValue ( ~listValues ; 1 )
+
+/**	Check if the value matches; if it does, copy it into the list that will be returned at the end. **/
+;	$~list.getPartialMatches__matchingValues = List 
+	( 	$~list.getPartialMatches__matchingValues
+	; 	If
+		(	GetAsBoolean ( Position ( ~valueToCheck ; ~searchText ; 0 ; 1 ) )
+		;		~valueToCheck
+		)
+	)
+
+/**	Check if there are more values in the list, using `Middle()` to optimize performance. **/
+;	~offset1.0 = Length ( "¶" ) /** Correct for the offset from isolating the first value. **/
+
+;	~pos1.0 = Position ( ~listValues ; "¶" ; 0 ; 1 ) + ~offset1.0
+;	~pos1.0 = If 
+	(	~pos1.0 > 0
+	;		~pos1.0
+
+	/**	ELSE **/
+	;		Length ( ~listValues )
+	)
+
+;	~pos1.1 = Length ( ~listValues ) + ~offset1.0
+;	~length1.0 = ~pos1.1 - ~pos1.0
+;	~listRemainingValues = Case
+	(	~pos1.0 > 1
+	;		Middle ( ~listValues ; ~pos1.0 ; ~length1.0 )
+	)
+
+]
+;   Case 
+	(	GetAsBoolean ( Position ( ~listValues ; "¶" ; 0 ; 49999 ) ) /** If there are more than 49,999 values in the list, it will break the recursion limit. **/
+	;		"? - Due to recursion limits, lists longer than 49,999 values cannot be processed by this function."
+
+	;	IsEmpty ( ~listRemainingValues ) /** If there are no more values to check, return the result list and clear reusable variables. **/
+		or not GetAsBoolean ( Position ( ~listValues ; ~searchText ; 0 ; 1 ) ) /** If the search value doesn't exist anywhere in the list, don't bother recursing. **/
+	;		Let (
+			[ 	~returnResult = $~list.getPartialMatches__matchingValues
+			;	$~list.getPartialMatches__matchingValues = $null
+			]
+			;	~returnResult
+			)
+
+	/**	ELSE - If there are more values to check, then recurse. **/
+	;		list.getPartialMatches ( ~listRemainingValues ; ~searchText )
+	)
+)

@@ -1,0 +1,66 @@
+/** 
+# window.isMode ( modeNameOrNumber )
+ - Given the mode name (e.g., `"browse"`) or number (e.g., `1`), this function
+    returns TRUE if the window is currently in that mode, or FALSE if not.
+
+
+## PARAMETERS
+### modeNameOrNumber ( text|number, required )
+ - The name or number of the mode you are testing for:
+   - `0` or `Browse`
+   - `1` or `Find`
+   - `2` or `Preview`
+
+## USAGE
+```
+If [ not window.isMode ( "browse" ) ]
+    Enter Browse Mode []
+End If
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 19, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~modeNameOrNumber = Lower ( modeNameOrNumber )
+	~modeNumber = Case 
+	(	~modeNameOrNumber = "browse"
+	;		0
+
+	;	~modeNameOrNumber = "find"
+	;		1
+
+	;	~modeNameOrNumber = "preview"
+	;		2
+
+	/** Error Checking **/
+	;	not ( ~modeNameOrNumber = GetAsNumber ( ~modeNameOrNumber ) )	
+		or GetAsNumber ( ~modeNameOrNumber ) > 2
+		or GetAsNumber ( ~modeNameOrNumber ) < 0
+	;		"? - Unexpected value for modeNameOrNumber parameter, `" & ~modeNameOrNumber & "`."
+
+	/**	DEFAULT **/
+	;	GetAsNumber ( ~modeNameOrNumber )
+	)
+
+	~currentWindowMode = Get ( WindowMode )
+
+;   ~returnValue = Case
+	(	/** Error Checking **/
+		Left ( ~modeNumber ; 1 ) = "?"
+	;		~modeNumber
+
+	/**	DEFAULT **/
+	;		GetAsBoolean ( ~currentWindowMode = ~modeNumber )
+	)
+]
+;   ~returnValue
+)

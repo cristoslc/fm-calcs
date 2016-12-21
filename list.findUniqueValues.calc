@@ -30,6 +30,9 @@ Let (
 
  
 ## CHANGELOG
+### v2.0 Nov 3, 2016
+ - Updated by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Refactored to use chunking to exceed prior recursion limit and improve performance.
 ### v1.0 Nov 2, 2016
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
@@ -39,7 +42,7 @@ Let (
 [   ~listValues = theList
 ;	~listExceptions = optional_listOfExceptions
 
-;	~maxLengthlistValues = 49999 /** Based on recursion limits, lists longer than this will result in an error. **/
+;	~maxLengthlistValues = 499999 /** Based on recursion limits, lists longer than this will result in an error. **/
 
 ;	~lengthListValues = If 
 	( 	not ( $~list.findUniqueValues__hasStarted )
@@ -49,33 +52,194 @@ Let (
 	) 
 
 ;	~listNewValues = Let (
-	[	~pos0 = Position ( ~listValues ; "¶" ; 0 ; 1 ) + 1
+	[	~pos0 = Position ( ~listValues ; "¶" ; 0 ; 10 ) + 1
 	;	~pos1 = Length ( ~listValues ) + 1
 	;	~length0 = ~pos1 - ~pos0
 	;	~word0 = Case 
 		(	~pos0 > 1
-		;		Middle ( ~listValues ; ~pos0 ; ~length0 ) /** `Middle()` is ever-so-slightly faster than `RightValues()` for this purpose. **/
+		;		Middle ( ~listValues ; ~pos0 ; ~length0 ) /** Using `Middle()` is slightly faster than `RightValues()` for this purpose. **/
 		)
 	]
 	;	~word0
 	)
 
-;	~topValue = GetValue ( ~listValues ; 1 ) /** This is no slower than using `Middle()` or `Left()` for this purpose, and is easier to read. **/
 
-;	~valueToCheck = ¶ & ~topValue & ¶ 
-;	~listToCheck = ¶ 
-		& $~list.findUniqueValues__listUniqueValues 
-		& ¶ 
+;	~topValue1 = GetValue ( ~listValues ; 1 ) /** This is no slower than using `Middle()` or `Left()` for this purpose, and is easier to read. **/
+;	~topValue2 = GetValue ( ~listValues ; 2 )
+;	~topValue3 = GetValue ( ~listValues ; 3 )
+;	~topValue4 = GetValue ( ~listValues ; 4 )
+;	~topValue5 = GetValue ( ~listValues ; 5 )
+;	~topValue6 = GetValue ( ~listValues ; 6 )
+;	~topValue7 = GetValue ( ~listValues ; 7 )
+;	~topValue8 = GetValue ( ~listValues ; 8 )
+;	~topValue9 = GetValue ( ~listValues ; 9 )
+;	~topValue10 = GetValue ( ~listValues ; 10 )
 
-;	~isValueExists = GetAsBoolean ( Position ( ~listToCheck ; ~valueToCheck ; 0 ; 1 ) )
-;	~isValueAnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ~valueToCheck ; 0 ; 1 ) )
+;	~listTopValues = List 
+	(	~topValue1
+	;	~topValue2
+	;	~topValue3
+	;	~topValue4
+	;	~topValue5
+	;	~topValue6
+	;	~topValue7
+	;	~topValue8
+	;	~topValue9
+	;	~topValue10
+	)
+
+;	~isValue1Exists = Let (
+	[	~topValueCounter = 0
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue1 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  False /** There are no values before the first one, so assume the value is not dulicated in the list. Later topValues will check if they are duplicates of this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue1AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue1 & ¶ ; 0 ; 1 ) )
+
+;	~isValue2Exists = Let (
+	[	~topValueCounter = 1
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue2 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue2 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue2AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue2 & ¶ ; 0 ; 1 ) )
+
+;	~isValue3Exists = Let (
+	[	~topValueCounter = 2
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue3 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue3 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue3AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue3 & ¶ ; 0 ; 1 ) )
+
+;	~isValue4Exists = Let (
+	[	~topValueCounter = 3
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue4 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue4 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue4AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue4 & ¶ ; 0 ; 1 ) )
+
+;	~isValue5Exists = Let (
+	[	~topValueCounter = 4
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue5 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue5 & ¶ ; 0 ; 1 ) )
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue5AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue5 & ¶ ; 0 ; 1 ) )
+
+;	~isValue6Exists = Let (
+	[	~topValueCounter = 5
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue6 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue6 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue6AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue6 & ¶ ; 0 ; 1 ) )
+
+;	~isValue7Exists = Let (
+	[	~topValueCounter = 6
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue7 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue7 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue7AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue7 & ¶ ; 0 ; 1 ) )
+
+;	~isValue8Exists = Let (
+	[	~topValueCounter = 7
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue8 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue8 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue8AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue8 & ¶ ; 0 ; 1 ) )
+
+;	~isValue9Exists = Let (
+	[	~topValueCounter = 8
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue9 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue9 & ¶ ; 0 ; 1 ) ) /** Use `LeftValues()` to see if value exists in any of the other chunk segments prior to this one. **/
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue9AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue9 & ¶ ; 0 ; 1 ) )
+
+;	~isValue10Exists = Let (
+	[	~topValueCounter = 9
+	;	~isDuplicateInUniqueList = GetAsBoolean ( Position ( ¶ & $~list.findUniqueValues__listUniqueValues & ¶ ; ¶ & ~topValue10 & ¶ ; 0 ; 1 ) )
+	;	~isDuplicateInTopValues =  GetAsBoolean ( Position ( ¶ & LeftValues ( ~listTopValues ; ~topValueCounter ) & ¶ ; ¶ & ~topValue10 & ¶ ; 0 ; 1 ) )
+	]
+	;	~isDuplicateInUniqueList
+		or ~isDuplicateInTopValues
+	)
+;	~isValue10AnException = GetAsBoolean ( Position ( ¶ & ~listExceptions & ¶ ; ¶ & ~topValue10 & ¶ ; 0 ; 1 ) )
 
 ;	$~list.findUniqueValues__listUniqueValues = List 
 	(	$~list.findUniqueValues__listUniqueValues
 	;	If 
-		(	not ( ~isValueExists )
-			or ~isValueAnException
-		;		~topValue
+		(	not ( ~isValue1Exists )
+			or ~isValue1AnException
+		;		~topValue1
+		)
+	;	If 
+		(	not ( ~isValue2Exists )
+			or ~isValue2AnException
+		;		~topValue2
+		)
+	;	If 
+		(	not ( ~isValue3Exists )
+			or ~isValue3AnException
+		;		~topValue3
+		)
+	;	If 
+		(	not ( ~isValue4Exists )
+			or ~isValue4AnException
+		;		~topValue4
+		)
+	;	If 
+		(	not ( ~isValue5Exists )
+			or ~isValue5AnException
+
+		;		~topValue5
+		)
+	;	If 
+		(	not ( ~isValue6Exists )
+			or ~isValue6AnException
+		;		~topValue6
+		)
+	;	If 
+		(	not ( ~isValue7Exists )
+			or ~isValue7AnException
+		;		~topValue7
+		)
+	;	If 
+		(	not ( ~isValue8Exists )
+			or ~isValue8AnException
+		;		~topValue8
+		)
+	;	If 
+		(	not ( ~isValue9Exists )
+			or ~isValue9AnException
+		;		~topValue9
+		)
+	;	If 
+		(	not ( ~isValue10Exists )
+			or ~isValue10AnException
+		;		~topValue10
 		)
 	)
 

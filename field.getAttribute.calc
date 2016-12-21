@@ -1,0 +1,134 @@
+/** 
+# field.getAttribute ( fieldObject ; attributeNameOrNumber )
+ - Provides attributes of Database fields
+
+
+## PARAMETERS
+### fieldObject ( field, required )
+ - The Fully-Qualified Field Object for the field whose attribute you want to return.
+### attributeNameOrNumber ( text, required )
+ - The name or number of the attribute you want to return. Valid values are:
+   - `storagetype` or `1` (returns: `Standard`, `StoredCalc`, `Summary`, `UnstoredCalc`, `External(Secure)`, `External(Open)`, or `Global`)
+   - `datatype` or `2` (returns: `text`, `number`, `date`, `time`, `timestamp`, or `container`)
+   - `isIndexed` or `3` (returns: `True` or `False`)
+   - `maxRepetitions` or `4` (returns: an integer value)
+
+
+## USAGE
+```
+field.getAttribute ( Customers::months_since_first_order ; type )
+```
+- Returns `number`.
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 7, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~fieldObject = fieldObject
+;   ~fieldFqName = If 
+    (   not ( GetAsText ( ~fieldObject ) = ~fieldObject )
+    ;       GetFieldName ( ~fieldObject )
+
+    /** ELSE **/
+    ;       ~fieldObject
+    )
+
+;   ~attributeNameOrNumber = attributeNameOrNumber
+;   ~attributeNameOrNumber.asText = Lower ( attributeNameOrNumber )
+;   ~attributeNameOrNumber.asNumber = GetAsNumber ( attributeNameOrNumber )
+;   ~attributeNumber = Case 
+    (   Exact ( ~attributeNameOrNumber.asNumber ; ~attributeNameOrNumber ) /** If it's a number, check the range. **/
+        and ~attributeNameOrNumber.asNumber  ≥ 1
+        and ~attributeNameOrNumber.asNumber ≤ 4
+    ;       ~attributeNameOrNumber.asNumber
+
+    /** DEFAULT **/
+    ;       /** Try to interpret the text, or return an error. **/
+            Case 
+            (   ~attributeNameOrNumber.asText = "storagetype"
+            ;       1
+
+            ;   ~attributeNameOrNumber.asText = "datatype"
+            ;       2
+
+            ;   ~attributeNameOrNumber.asText = "isIndexed"
+            ;       3
+
+            ;   ~attributeNameOrNumber.asText = "maxRepetitions"
+            ;       4
+
+            /** DEFAULT **/
+            ;       "? - unrecognized attributeNameOrNumber value, `" & ~attributeNameOrNumber & "`."
+            )
+    )
+
+;   ~fieldAttributes = FieldType ( Get ( FileName ) ; ~fieldFqName )
+;   ~listFieldAttributes = Substitute ( ~fieldAttributes ; [ " " ; "¶" ] )
+
+    /** Get the appropriate attribute, then cast it as the right datatype. **/
+;   ~fieldAttributeValue = GetValue ( ~listFieldAttributes ; ~attributeNumber )
+;   ~fieldAttributeValue = Case 
+    (   /** Cast as TEXT if returning an error. **/
+        Left ( ~fieldAttributeValue ; 1 ) = "?"
+    ;       GetAsText ( ~fieldAttributeValue )
+
+    ;   /** Cast as TEXT if returning `storagetype` attribute. **/
+        ~attributeNumber = 1
+    ;       GetAsText ( ~fieldAttributeValue )
+
+    ;   /** Cast as LOWER TEXT if returning `datatype` attribute. **/
+        ~attributeNumber = 2
+    ;       Lower ( ~fieldAttributeValue )
+
+    ;   /** Cast as BOOLEAN if returning `isIndexed` attribute. **/
+        ~attributeNumber = 3
+    ;       Exact ( ~fieldAttributeValue ; "Indexed" )
+
+    ;   /** Cast as NUMBER if returning `maxRepetitions` attribute. **/
+        ~attributeNumber = 4
+    ;       GetAsNumber ( ~fieldAttributeValue )
+
+    /** DEFAULT **/
+    ;       ~fieldAttributeValue
+    )
+
+;   ~returnValue = Case 
+    (   /** ERROR CHECKING **/
+        IsEmpty ( ~attributeNameOrNumber )
+    ;       "? - missing required parameter, `attributeNameOrNumber`."
+
+    ;   IsEmpty ( ~fieldFqName )
+    ;       "? - missing required parameter, `fieldObject`."
+
+    ;   Left ( ~attributeNumber ; 1 ) = "?"
+    ;       If 
+            (   Length ( ~attributeNumber ) > 1 
+            ;       ~attributeNumber
+
+            /** ELSE **/
+            ;       "? - Unable to get ~attributeNumber."
+            )
+
+    ;   Left ( ~fieldAttributeValue ; 1 ) = "?"
+    ;       If 
+            (   Length ( ~fieldAttributeValue ) > 1
+            ;       ~fieldAttributeValue
+
+            /** ELSE **/
+            ;       "? - Unable to get Field attributes."
+            )
+
+    /** DEFAULT **/
+    ;       ~fieldAttributeValue
+
+    )
+]
+;   ~returnValue
+)

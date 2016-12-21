@@ -1,0 +1,70 @@
+/** 
+# layout.isOnTable ( fqFieldObject )
+ - Returns TRUE if the current layout's Table is the same
+ 	as the Table that fqFieldObject is from.
+
+
+## PARAMETERS
+### fqFieldObject ( field, required )
+ - A fully-qualified field object (not just the name) from the table
+ 	that you want to check against.
+
+
+## USAGE
+```
+Go To Layout [ "Customers - Utility" ]
+If [ not ( layout.isOnTable ( Customers::zz_constant_1_calc ) ]
+	# Do this if you are not on the "Customers" table.
+End If
+```
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Nov 16, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~fieldFqName = GetFieldName ( fqFieldObject )
+	~fieldFqName = Case 
+	(	Left ( ~fieldFqName ; 1 ) = "?"
+		or IsEmpty ( ~fieldFqName )
+	;		fqFieldObject /** If `GetFieldName()` fails, try treating it as text. **/
+	/**	DEFAULT **/
+	;		~fieldFqName
+	)
+
+;	~targetTableName = Let (
+	[	~text0 = ~fieldFqName
+	;	~delim0 = "::"
+	;	~pos0a = 1
+	;	~pos0b = Position ( ~text0 ; ~delim0 ; 0 ; 1 )
+	;	~len0 = ~pos0b - ~pos0a
+	;	~word0 = Middle ( ~text0 ; ~pos0a ; ~len0 )
+
+	;	~returnValue = ~word0
+	]
+	;	~returnValue
+	)
+
+;	~currentTableName = Get ( LayoutTableName )
+
+;   ~returnValue = Case 
+	(	IsEmpty ( ~fieldFqName )
+		or Exact ( Left ( ~fieldFqName ; 1 ) ; "?" )
+	;		"? ~fieldFqName \"" & ~fieldFqName & "\" is not valid."
+
+	;	IsEmpty ( ~targetTableName )
+		or Exact ( Left ( ~targetTableName ; 1 ) ; "?" )
+	;		"? ~targetTableName \"" & ~targetTableName & "\" is not valid."
+
+	/**	DEFAULT **/
+	;		Exact ( ~targetTableName ; ~currentTableName )
+	)
+]
+;   ~returnValue
+)

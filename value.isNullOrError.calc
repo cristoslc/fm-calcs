@@ -1,0 +1,46 @@
+/** 
+# value.isNullOrError ( valueToCheck )
+ - Useful for validity checking. Returns True if `valueToCheck` is empty or begins with `?`.
+
+
+## PARAMETERS
+### valueToCheck ( any datatype, required )
+ - The value you want to examine.
+
+
+## USAGE
+```
+Set Value [ $idCustomer ; Value: #Get ( $letDictionary ; "customerId" ) ]
+If [ value.isNullOrError ( $idCustomer ) ]
+    # Do something in case there's no valid idCustomer.
+End If
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.1 Dec 21, 2016
+ - Updated by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+   - Added Let statements with locally-scoped vars to populate data viewer / be used in script.
+   
+### v1.0 Dec 21, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~valueToCheck = valueToCheck
+
+;   ~isNull = GetAsBoolean ( IsEmpty ( ~valueToCheck ) )
+;	~isError = GetAsBoolean ( Left ( ~valueToCheck ; 1 ) = "?" )
+
+;	$~value.isNullOrError__isNull = ~isNull
+;	$~value.isNullOrError__isError = ~isError
+
+;   ~returnValue = ~isNull or ~isError
+]
+;   ~returnValue
+)

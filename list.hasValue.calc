@@ -1,0 +1,41 @@
+/** 
+# list.hasValue ( listOfValues ; valueToCheck )
+ - Determines if `listOfValues` contains the unique `valueToCheck`. 
+ - Returns boolean True|False.
+
+
+## PARAMETERS
+### listOfValues ( text, required )
+ - The list of values in which you want to search for `valueToCheck`.
+### valueToCheck ( text, required )
+ - The value you want to find in `listOfValues`.
+
+
+## USAGE
+```
+If [ list.hasValue ( $idlistCustomers ; $idCustomer ) ]
+	# Returned true! Do something with $idCustomer.
+End If
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 12, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~listOfValues = ¶ & listOfValues & ¶
+;	~valueToCheck = ¶ & valueToCheck & ¶
+
+;	~isListContainsValue = GetAsBoolean ( Position ( ~listOfValues ; ~valueToCheck ; 0 ; 1 ) )
+
+;   ~returnValue = ~isListContainsValue
+]
+;   ~returnValue
+)
