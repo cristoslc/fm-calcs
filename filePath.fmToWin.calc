@@ -1,0 +1,67 @@
+/** 
+# filePath.fmToWin ( fmFilePath )
+ - Converts a FileMaker filepath to a Windows filepath.
+
+
+## PARAMETERS
+### fmFilePath ( text, required )
+ - A FileMaker-formatted filepath (e.g., `filewin://server/sharedfolder/file.txt`).
+
+
+## USAGE
+```
+Let (
+[	$~filePath.fmToWin__filePath = "filewin://server/sharedFolder/file.txt"
+;	$~filePath.fmToWin__winFilePath = filePath.fmToWin ( $~filePath.fmToWin__filePath )
+]
+;	$~filePath.fmToWin__winFilePath // = "\\server\sharedFolder\file.txt"
+)
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Dec 21, 2016
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   $~filePath.fmToWin__filePath.fm = fmFilePath
+
+;	$~filePath.fmToWin__sourceText = $~filePath.fmToWin__filepath.fm
+;	$~filePath.fmToWin__searchText = "/"
+;   $~filePath.fmToWin__segment0.start = Position ( $~filePath.fmToWin__sourceText ; $~filePath.fmToWin__searchText ; 0 ; 1)
+;	$~filePath.fmToWin__segment0.end = Length ( $~filePath.fmToWin__sourceText ) + Length ( $~filePath.fmToWin__searchText )
+;	$~filePath.fmToWin__segment0.length = $~filePath.fmToWin__segment0.end - $~filePath.fmToWin__segment0.start
+;	$~filePath.fmToWin__segment0.value = Middle ( $~filePath.fmToWin__sourceText ; $~filePath.fmToWin__segment0.start ; $~filePath.fmToWin__segment0.length )
+
+;	$~filePath.fmToWin__isNetworkPath = GetAsBoolean ( Left ( $~filePath.fmToWin__segment0.value ; 2 ) = "//" )
+
+;	$~filePath.fmToWin__filePath.win = Substitute
+	(	$~filePath.fmToWin__segment0.value
+	;	[ "/" ; "\\" ]
+	)
+;	$~filePath.fmToWin__filePath.win = Case
+	(	$~filePath.fmToWin__isNetworkPath
+			/** Leave leading slashes in place. **/
+	;		$~filePath.fmToWin__filePath.win
+
+	/** DEFAULT **/
+		/** Remove leading slashes. **/
+	;	If 
+		(	Left ( $~filePath.fmToWin__filePath.win ; 1 ) = "\\"
+		;		Right ( $~filePath.fmToWin__filePath.win ; Length ( $~filePath.fmToWin__filePath.win ) - 1 )
+		
+		/**	ELSE **/
+		;		$~filePath.fmToWin__filePath.win
+		)
+	)
+
+;	$~filePath.fmToWin__returnValue = $~filePath.fmToWin__filePath.win
+]
+;	$~filePath.fmToWin__returnValue
+)
