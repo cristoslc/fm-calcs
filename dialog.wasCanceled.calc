@@ -1,0 +1,35 @@
+/** 
+# dialog.wasCanceled
+ - Checks a global variable indicating whether or not the modal dialog was canceled.
+ - Use `dialog.cancelDialog` to set.
+
+
+## PARAMETERS
+### dialog.cancelDialog
+
+
+## USAGE
+```
+Set Variable [ $~void ; Value: dialog.cancelDialog ]
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Feb 14, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~dialog.wasCanceled = $$dialog__isCanceled
+
+;   $$dialog__isCanceled = $null /** Clear the variable for the next use. **/
+
+;   ~returnValue = ~dialog.wasCanceled 
+]
+;   ~returnValue
+)

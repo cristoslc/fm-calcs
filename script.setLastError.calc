@@ -1,0 +1,389 @@
+/** 
+# script.setLastError
+ - Sets a local variable with the last error.
+ - This function can be amended to include errors from various plugins,
+ 	 as well as native FileMaker errors.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+- Note that the same error-handling block can be used for both kinds of errors.
+
+### Example 1: Native FileMaker error
+```
+Loop
+	Go To Layout [ original layout ]
+	Exit Loop If [ script.setLastError ]
+
+	# Do some things on the layout.
+
+	Exit Loop If [ True // Exit single-pass loop. ]
+End Loop
+
+If [ script.lastError.exists ]
+	Show Custom Dialog [ "ERROR" ; "A " & script.lastError.type & " error has occurred. Error code: " & script.lastError.code & "." ]
+End If
+```
+
+### Example 2: Plugin error
+```
+Loop
+	Set Variable [ $~httpGet ; Value: BE_HTTP_GET ( $url ) ]
+	Exit Loop If [ script.setLastError ]
+
+	# Do some things with the result of the HTTP call.
+
+	Exit Loop If [ True // Exit single-pass loop. ]
+End Loop
+
+If [ script.lastError.code > 0 ]
+	Show Custom Dialog [ "ERROR" ; "A " & script.lastError.type & " error has occurred. Error code: " & script.lastError.code & " - " & script.lastError.description ]
+End If
+```
+
+ 
+## REQUIRES
+ - `#` custom function for serializing name-value pairs
+ - While not required, the following custom functions are recommended and may be utilized in the examples:
+   - `script.lastError`
+   - `script.lastError.code`
+   - `script.lastError.description`
+   - `script.lastError.exists`
+   - `script.lastError.type`
+
+ 
+## CHANGELOG
+### v1.1 2017-02-28
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Re-ordered ~dictError case statement so that FileMaker errors will always be checked first.
+
+### v1.0 2017-02-20
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Includes code from [`ErrorDefinition()`](http://fmfunctions.com/functions_display_record.php?functionId=397).
+
+**/
+
+Let (
+[	~dictError = Case 
+	(	/** FileMaker **/
+		Get ( LastError ) > 0
+	;		#( "type" ; "FileMaker" ) 
+			& #( "code" ; Get ( LastError ) )
+			& #
+			( 	"description" 
+			;	Let 
+				(	err = Get ( LastError ) 
+				;	Case
+					(	err = -1; "Unknown error";
+						err = 0; "No error";
+						err = 1; "User canceled action";
+						err = 2; "Memory error";
+						err = 3; "Command is unavailable (for example, wrong operating system, wrong mode, etc.)";
+						err = 4; "Command is unknown";
+						err = 5; "Command is invalid (for example, a Set Field script step does not have a calculation specified)";
+						err = 6; "File is read-only";
+						err = 7; "Running out of memory";
+						err = 8; "Empty result";
+						err = 9; "Insufficient privileges to modify/access data";
+						err = 10; "Requested data is missing";
+						err = 11; "Name is not valid";
+						err = 12; "Name already exists";
+						err = 13; "File or object is in use";
+						err = 14; "Out of range";
+						err = 15; "Can't divide by zero";
+						err = 16; "Operation failed, request retry (for example, a user query)";
+						err = 17; "Attempt to convert foreign character set to UTF-16 failed";
+						err = 18; "Client must provide account information to proceed";
+						err = 19; "String contains characters other than A-Z, a-z, 0-9 (ASCII)";
+						err = 20; "Command/operation cancelled by triggered script";
+						err = 21; "Map Win 32 error of \"ERROR_NOT_SUPPORTED\". Microsoft documentation is \"the request is not supported\".";
+						err = 26; "The file path specified is not a valid file path";
+						err = 100; "File is missing";
+						err = 101; "Record is missing";
+						err = 102; "Field is missing";
+						err = 103; "Relationship is missing";
+						err = 104; "Script is missing";
+						err = 105; "Layout is missing";
+						err = 106; "Table is missing";
+						err = 107; "Index is missing";
+						err = 108; "Value list is missing";
+						err = 109; "Privilege set is missing";
+						err = 110; "Related tables are missing";
+						err = 111; "Field repetition is invalid";
+						err = 112; "Window is missing";
+						err = 113; "Function is missing";
+						err = 114; "File reference is missing";
+						err = 115; "Specified menu set is not present";
+						err = 116; "Specified layout object is not present";
+						err = 117; "Specified data source is not present";
+						err = 130; "Files are damaged or missing and must be reinstalled";
+						err = 131; "Language pack files are missing (such as template files)";
+						err = 200; "Record access is denied";
+						err = 201; "Field cannot be modified";
+						err = 202; "Field access is denied";
+						err = 203; "No records in file to print, or password doesn't allow print access";
+						err = 204; "No access to field(s) in sort order";
+						err = 205; "User does not have access privileges to create new records; import will overwrite existing data";
+						err = 206; "User does not have password change privileges, or file is not modifiable";
+						err = 207; "User does not have sufficient privileges to change database schema, or file is not modifiable";
+						err = 208; "Password does not contain enough characters";
+						err = 209; "New password must be different from existing one";
+						err = 210; "User account is inactiveUser account is inactive";
+						err = 211; "Password has expired";
+						err = 212; "Invalid user account and/or password. Please try again";
+						err = 213; "User account and/or password does not exist";
+						err = 214; "Too many login attempts";
+						err = 215; "Administrator privileges cannot be duplicated";
+						err = 216; "Guest account cannot be duplicated";
+						err = 217; "User does not have sufficient privileges to modify administrator accountUser does not have sufficient privileges to modify administrator account";
+						err = 218; "Password and verify password do not match (iPhone)";
+						err = 300; "File is locked or in use";
+						err = 301; "Record is in use by another user";
+						err = 302; "Table is in use by another user";
+						err = 303; "Database schema is in use by another user";
+						err = 304; "Layout is in use by another user";
+						err = 306; "Record modification ID does not match";
+						err = 307; "Lost connection to the host and the transaction could not relock";
+						err = 400; "Find criteria are empty";
+						err = 401; "No records match the request";
+						err = 402; "Selected field is not a match field for a lookup";
+						err = 403; "Exceeding maximum record limit for trial version of FileMaker Pro";
+						err = 404; "Sort order is invalid";
+						err = 405; "Number of records specified exceeds number of records that can be omitted";
+						err = 406; "Replace/Reserialize criteria are invalid";
+						err = 407; "One or both match fields are missing (invalid relationship)";
+						err = 408; "Specified field has inappropriate data type for this operation";
+						err = 409; "Import order is invalid";
+						err = 410; "Export order is invalid";
+						err = 412; "Wrong version of FileMaker Pro used to recover file";
+						err = 413; "Specified field has inappropriate field type";
+						err = 414; "Layout cannot display the result";
+						err = 415; "One or more required related records are not available";
+						err = 416; "Primary key required from data source table";
+						err = 417; "Database is not supported for ODBC operations";
+						err = 418; "The base directory specified in the CREATE TABLE ... field blob EXTERNAL 'path' not found";
+						err = 500; "Date value does not meet validation entry options";
+						err = 501; "Time value does not meet validation entry options";
+						err = 502; "Number value does not meet validation entry options";
+						err = 503; "Value in field is not within the range specified in validation entry options";
+						err = 504; "Value in field is not unique as required in validation entry options";
+						err = 505; "Value in field is not an existing value in the database file as required in validation entry options";
+						err = 506; "Value in field is not listed on the value list specified in validation entry option";
+						err = 507; "Value in field failed calculation test of validation entry option";
+						err = 508; "Invalid value entered in Find mode";
+						err = 509; "Field requires a valid value";
+						err = 510; "Related value is empty or unavailable";
+						err = 511; "Value in field exceeds maximum field size";
+						err = 512; "Record was already modified by another user";
+						err = 513; "Record must have a value in some field to be created";
+						err = 600; "Print error has occurred";
+						err = 601; "Combined header and footer exceed one page";
+						err = 602; "Body doesn't fit on a page for current column setup";
+						err = 603; "Print connection lost";
+						err = 700; "File is of the wrong file type for import";
+						err = 706; "EPSF file has no preview image";
+						err = 707; "Graphic translator cannot be found";
+						err = 708; "Can't import the file or need color monitor support to import file";
+						err = 709; "QuickTime movie import failed";
+						err = 710; "Unable to update QuickTime reference because the database file is read-only";
+						err = 711; "Import translator cannot be found";
+						err = 714; "Password privileges do not allow the operation";
+						err = 715; "Specified Excel worksheet or named range is missing";
+						err = 716; "A SQL query using DELETE, INSERT, or UPDATE is not allowed for ODBC import";
+						err = 717; "There is not enough XML/XSL information to proceed with the import or export";
+						err = 718; "Error in parsing XML file (from Xerces)";
+						err = 719; "Error in transforming XML using XSL (from Xalan)";
+						err = 720; "Error when exporting; intended format does not support repeating fields";
+						err = 721; "Unknown error occurred in the parser or the transformer";
+						err = 722; "Cannot import data into a file that has no fields";
+						err = 723; "You do not have permission to add records to or modify records in the target table";
+						err = 724; "You do not have permission to add records to the target table";
+						err = 725; "You do not have permission to modify records in the target table";
+						err = 726; "There are more records in the import file than in the target table. Not all records were imported";
+						err = 727; "There are more records in the target table than in the import file. Not all records were updated";
+						err = 729; "Errors occurred during import. Records could not be imported";
+						err = 730; "Unsupported Excel version. (Convert file to Excel 7.0 (Excel 95), Excel 97, 2000, or XP format and try again)";
+						err = 731; "The file you are importing from contains no data";
+						err = 732; "This file cannot be inserted because it contains other files";
+						err = 733; "A table cannot be imported into itself";
+						err = 734; "This file type cannot be displayed as a picture";
+						err = 735; "This file type cannot be displayed as a picture. It will be inserted and displayed as a file";
+						err = 736; "Too much data to export to this format. It will be truncated";
+						err = 737; "Bento table is reported as missed when trying to import it";
+						err = 738; "A theme named \1770 already exists in \1771.\nDo you want to replace it with the theme that you are importing?\"";
+						err = 800; "Unable to create file on disk";
+						err = 801; "Unable to create temporary file on System disk";
+						err = 802; "Unable to open file";
+						err = 803; "File is single user or host cannot be found";
+						err = 804; "File cannot be opened as read-only in its current state";
+						err = 805; "File is damaged; use Recover command";
+						err = 806; "File cannot be opened with this version of FileMaker Pro";
+						err = 807; "File is not a FileMaker Pro file or is severely damaged";
+						err = 808; "Cannot open file because access privileges are damaged";
+						err = 809; "Disk/volume is full";
+						err = 810; "Disk/volume is locked";
+						err = 811; "Temporary file cannot be opened as FileMaker Pro file";
+						err = 813; "Record Synchronization error on network";
+						err = 814; "File(s) cannot be opened because maximum number is open";
+						err = 815; "Couldn't open lookup file";
+						err = 816; "Unable to convert file";
+						err = 817; "Unable to open file because it does not belong to this solution";
+						err = 819; "Cannot save a local copy of a remote file";
+						err = 820; "File is in the process of being closed";
+						err = 821; "Host forced a disconnect";
+						err = 822; "FMI files not found; reinstall missing files";
+						err = 823; "Cannot set file to single-user, guests are connected";
+						err = 824; "File is damaged or not a FileMaker file";
+						err = 825; "File is not authorized to reference the protected file";
+						err = 827; "File was not created because the source contained no data or is a reference. (new to FileMaker Pro 14)";
+						err = 850; "This path is not valid (for the platform it represents)";
+						err = 851; "The external file can not be deleted from disk. Do you want to delete the reference to the file anyway?";
+						err = 852; "Can not write file to the external storage.";
+						err = 853; "One or more containers failed to transfer";
+						err = 900; "General spelling engine error";
+						err = 901; "Main spelling dictionary not installed";
+						err = 902; "Could not launch the Help system";
+						err = 903; "Command cannot be used in a shared file";
+						err = 905; "No active field selected; command can only be used if there is an active field";
+						err = 906; "Current file must be shared in order to use this command";
+						err = 920; "Can't initialize the spelling engine";
+						err = 921; "User dictionary cannot be loaded for editing";
+						err = 922; "User dictionary cannot be found";
+						err = 923; "User dictionary is read-only";
+						err = 951; "An unexpected error occurred (*)";
+						err = 954; "Unsupported XML grammar (*)";
+						err = 955; "No database name (*)";
+						err = 956; "Maximum number of database sessions exceeded (*)";
+						err = 957; "Conflicting commands (*)";
+						err = 958; "Parameter missing (*)";
+						err = 1200; "Generic calculation error";
+						err = 1201; "Too few parameters in the function";
+						err = 1202; "Too many parameters in the function";
+						err = 1203; "Unexpected end of calculation";
+						err = 1204; "Number, text constant, field name or \"(\" expected";
+						err = 1205; "Comment is not terminated with \"*/\"";
+						err = 1206; "Text constant must end with a quotation mark";
+						err = 1207; "Unbalanced parenthesis";
+						err = 1208; "Operator missing, function not found or \"(\" not expected";
+						err = 1209; "Name (such as field name or layout name) is missing";
+						err = 1210; "Plug-in function has already been registered";
+						err = 1211; "List usage is not allowed in this function";
+						err = 1212; "An operator (for example, +, -, *) is expected here";
+						err = 1213; "This variable has already been defined in the Let function";
+						err = 1214; "AVERAGE, COUNT, EXTEND, GETREPETITION, MAX, MIN, NPV, STDEV, SUM and GETSUMMARY: expression found where a field alone is needed";
+						err = 1215; "This parameter is an invalid Get function parameter";
+						err = 1216; "Only Summary fields allowed as first argument in GETSUMMARY";
+						err = 1217; "Break field is invalid";
+						err = 1218; "Cannot evaluate the number";
+						err = 1219; "A field cannot be used in its own formula";
+						err = 1220; "Field type must be normal or calculated";
+						err = 1221; "Data type must be number, date, time, or timestamp";
+						err = 1222; "Calculation cannot be stored";
+						err = 1223; "The function is not implemented";
+						err = 1224; "The function is not defined";
+						err = 1225; "The function is not supported in this context";
+						err = 1300; "The specified name can't be used";
+						err = 1400; "ODBC driver initialization failed; make sure the ODBC drivers are properly installed";
+						err = 1401; "Failed to allocate environment (ODBC)";
+						err = 1402; "Failed to free environment (ODBC)";
+						err = 1403; "Failed to disconnect (ODBC)";
+						err = 1404; "Failed to allocate connection (ODBC)";
+						err = 1405; "Failed to free connection (ODBC)";
+						err = 1406; "Failed check for SQL API (ODBC)";
+						err = 1407; "Failed to allocate statement (ODBC)";
+						err = 1408; "Extended error (ODBC)";
+						err = 1409; "Error (ODBC)";
+						err = 1413; "Failed communication link (ODBC)";
+						err = 1414; "ODBC/SQL Statement Too Long";
+						err = 1450; "Action requires PHP privilege extension (*)";
+						err = 1451; "Action requires that current file be remote";
+						err = 1501; "The authentication Failed.";
+						err = 1502; "The connection was refused by the SMTP server.";
+						err = 1503; "There was an error with SSL.";
+						err = 1504; "The server required the connection to be encrypted.";
+						err = 1505; "The specified authentication is not supported by the SMTP server.";
+						err = 1506; "Email(s) could not be sent successfully.";
+						err = 1507; "Unable to login into the SMTP Server.";
+						err = 1550; "The file isn't a plugin, or can't load for some reason";
+						err = 1551; "Can't delete existing plugin, can't write to the folder, can't put on disk for some reason";
+						err = 1626; "The protocol is not supported";
+						err = 1627; "The authentication Failed.";
+						err = 1628; "There was an error with SSL.";
+						err = 1629; "The connection timed out";
+						err = 1630; "The url format is incorrect";
+						err = 1631; "The connection failed";
+						err = 1632; "The certificate has expired. (previously, The Certificate cannot be authenticated by a supported CA)";
+						err = 1633; "The certificate is self-signed. (previously, The Certificate is valid, but still wrong. e.g. hostname doesn't match, or expired)";
+						err = 1634; "A certificate verification error occurred. (new to FileMaker Pro 15)";
+						err = 2021; "plug-ins configuration disallowed";
+						err = 2046; "This command or action cannot be performed because that functionality is no longer supported";
+						err = 2047; "Bento 2 (or later) is not presented on the system";
+						err = 2048; "The selected work book is not excel 2007/2008 format";
+						err = 2056; "This script step cannot be performed because this window is in a modal state.";
+						err = 3000; "Action never occurred because script was triggered";
+						err = 3001; "Set when a step returns but is not really finished (probably due to having to switch threads and keep engine thread running)";
+						err = 3002; "The external file can not be deleted from disk. Do you want to delete the reference to the file anyway?";
+						err = 3003; "Can not write file to the external storage.";
+						err = 3004; "Directory Cant Edit";
+						err = 3005; "Directory Cant Delete";
+						err = 3100; "Theme is in use";
+						err = 3219; "Convert Global To Remote Warning";
+						err = 3220; "Directory Not Accessible Warning";
+						err = 3316; "Wrning before clearing out existing find requests";
+						err = 3317; "Wrning before attempting to restore files from hibernation";
+						err = 3319; "Warning: SSL certificate is invalid. Do you want to continue? (new to FileMaker Pro 14, removed in FileMaker Pro 15)";
+						err = 3320; "Warning: SSL certificate could not be verified. Do you want to continue? (new to FileMaker Pro 14, removed in FileMaker Pro 15)";
+						err = 3427; "Button cannot contain a tab control [NEW in FMP 8.0, modified in FMP 13.0";
+						err = 3428; "When a panel is deleted, all the objects on that panel will be deleted [NEW in FMP 8.0, modified in FMP 13.0";
+						err = 3429; "One or more of the panels you've selected contain locked objects. Do you you want to delete those panel(s) even though they contain locked object(s)? [NEW in FMP 8.0, modified in FMP 13.0";
+						err = 3956; "The total size of all base directory paths cannot exceed ^1 bytes.";
+						err = 3958; "Please select at least one bar code type";
+						err = 3957; "At least one filter must remain.";
+						err = 3959; "\"At least one window orientation must be enabled.\" (new to FileMaker Pro 14)";
+						err = 4049; "\"To view FileMaker Pro Help, you must be connected to the Internet.\" (new to FileMaker Pro 15)";
+						err = 4103; "File path is invalid or cannot be resolved during file transfer";
+						err = 4104; "File i/o issue during file transfer";
+						err = 4106; "The target base directory \1770 is not valid.";
+						err = 4107; "The target base directory \1770 could not be created.";
+						err = 4603; "Spell Export Complete";
+						err = 4687; "\"To view FileMaker Pro update information, you must be connected to the Internet.\" (new to FileMaker Pro 15)";
+						err = 4688; "\"Internet connection failed. Cannot check for update information.\" (new to FileMaker Pro 15)";
+						err = 4689; "\"No update available right now.\" (new to FileMaker Pro 15)";
+						err = 4709; "Unsupported svg, can not be imported. (new to FileMaker Pro 14)";
+						err = 7100; "Data Deferred";
+						err = 8404; "An installed OnTimer script could not be found or could not be run with current access privileges";
+						err = 8213; "Too many temporary objects created, can't create any more.";
+						err = 8310; "There is an error in the syntax of the query.";
+						err = 8498; "Stale Import Order To Be Updated";
+						err = 8499; "Import Match May Be Invalid";
+						err = 20413; "Too Many Files";
+						err = 20605; "No network connection is available";
+						err = 20606; "Fail to resolve network address";
+						err = 20650; "Page doesn't have enough footer size for encryption (new to FileMaker Pro 14)";
+						"Error not defined through FMP v.15"
+					)
+				)
+			)
+
+
+	;	/** BaseElements **/
+		GetAsNumber ( BE_GetLastError ) > 0
+		or Length ( BE_GetLastError ) > 1
+	;		#( "type" ; "BaseElements" ) 
+			& #( "code" ; BE_GetLastError )
+			& #( "description" ; BE_JSON_Error_Description )
+
+
+	/** ELSE **/
+	;		False
+	)
+
+;   $~script.lastError = ~dictError
+
+;   ~returnValue = GetAsBoolean ( $~script.lastError )
+]
+;   ~returnValue
+)

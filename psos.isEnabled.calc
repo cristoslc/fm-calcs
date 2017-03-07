@@ -1,0 +1,55 @@
+/** 
+# psos.isEnabled
+ - Returns a boolean value, can be used in control logic to tell a script
+    whether or not to execute as a `Perform Script on Server` step.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+If [ psos.isEnabled ]
+    Perform Script on Server [ "Update Customer Transaction Totals" ]
+Else
+    Perform Script [ "Update Customer Transaction Totals" ]
+End If
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 Feb 16, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~hostVersion = GetAsNumber ( Get ( HostApplicationVersion ) )
+;	~isHostServer = Position ( Get ( HostApplicationVersion ) ; "Server" ; 0 ; 1 ) > 0
+
+;	~clientVersion = GetAsNumber ( Get ( ApplicationVersion ) )
+;	~isClientServer = Position ( Get ( ApplicationVersion ) ; "Server" ; 0 ; 1 ) > 0
+;	~isClientRuntime = Position ( Get ( ApplicationVersion ) ; "Runtime" ; 0 ; 1 ) > 0
+
+;	~isPsosPrefEnabled = True /** Point this at the appropriate field in your Preferences table. **/
+;	~isPsosDebugDisabled = $$debug__isDisablePsos
+
+;	~isPsosEnabled = 
+		~isPsosPrefEnabled
+		and not ~isPsosDebugDisabled
+		and ~isHostServer
+		and ~hostVersion > 13
+		and not ~isClientServer
+		and not ~isClientRuntime
+		and ~clientVersion > 13
+
+
+;   ~returnValue = ~isPsosEnabled
+]
+;   ~returnValue
+)

@@ -1,0 +1,40 @@
+/** 
+# sql.getInClauseList ( listValues )
+ - Takes a return-delimited list of values and converts them to a quoted, Comma-separated list compatible with SQL `WHERE ... IN (...)` clauses.
+
+
+## PARAMETERS
+### listValues ( text, required )
+ - A carriage-return delimited list of the values which you would like to wrap.
+
+
+## USAGE
+```
+Let (
+[	~listValues = List ( "Apples" ; "Bananas" ; "Cherries" )
+;	~sqllistValues = sql.getInClauseList ( ~listValues )
+;	~sqlQuery = "SELECT MyField FROM MyTable WHERE MatchField IN ( " & ~sqllistValues & " )"
+;	~result = ExecuteSQL ( ~sqlQuery ; $null ; $null )
+]
+;	~sqlQuery
+)
+```
+ - `~sqlQuery` would return `SELECT MyField FROM MyTable WHERE MatchField IN ( "Apples", "Bananas", "Cherries" )
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-03-07
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~listValues = listValues
+
+;   ~returnValue = "\"" & Substitute ( ~listValues ; [ "¶" ; "\", \"" ] ) & "\""
+]
+;   ~returnValue
+)

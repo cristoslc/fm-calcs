@@ -1,0 +1,43 @@
+/** 
+# script.lastError.description
+ - Gets the `description` attribute from the script.setLastError statement.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+Perform Find []
+Set Variable [ $~void ; Value: script.setLastError ]
+
+# Do some other stuff
+
+If [ script.lastError.code = 401 ]
+    # Do something if no results were returned.
+
+Else If [ script.lastError.exists ]
+    # Show the description for any other kinds of errors that returned.
+    Show Custom Dialog [ "Error" ; script.lastError.description ]
+
+Else
+    # Do something if the Find succeeded.
+
+End If
+```
+
+ 
+## REQUIRES
+ - `#Get()` Custom Function for retrieving values from key-value dictionaries.
+ - `script.setLastError` cf to set the appropriate dictionary.
+ - `script.lastError` cf (to minimize variable name locations).
+
+ 
+## CHANGELOG
+### v1.0 2017-02-28
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+#Get ( script.lastError ; "description" )

@@ -22,7 +22,7 @@
 ```
 Loop
 	Go to Layout [ "Customers" ]
-	Exit Loop If [ x.ThrowExceptionIf ( Get ( LastError ) > 0 ; 2000 ; "Unable to navigate to Customrs Layout. FileMaker error: " & Get ( LastError ) & "." ) ]
+	Exit Loop If [ x.ThrowExceptionIf ( Get ( LastError ) > 0 ; 2000 ; "Unable to navigate to Customers Layout. FileMaker error: " & Get ( LastError ) & "." ) ]
 
 	# Do stuff on the Customers layout
 
@@ -36,6 +36,11 @@ End Loop
  
 
 ## CHANGELOG
+
+### v1.1 2016-12-29
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - dropped use of `GetAsBoolean()` function for `~isTrueCondition` to improve performance.
+
 ### v1.0 Oct 12, 2016
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
@@ -45,11 +50,11 @@ End Loop
 Let (
 [   ~code = exCode
 ;   ~message = exMessage
-;   ~condition = exCondition
+;   ~isTrueCondition = exCondition
 ;	~lastException = optional_subscriptException
 ]
 ;   If 
-    (   GetAsBoolean ( ~condition )
+    (   ~isTrueCondition
     ;       x.ThrowException ( ~code ; ~message ; ~lastException )
     )
 )

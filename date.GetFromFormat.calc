@@ -1,0 +1,109 @@
+/** 
+# date.GetFromFormat ( dateText ; formatText )
+ - Converts a date from a given format into a standard FileMaker date.
+
+
+## PARAMETERS
+### dateText ( text, required )
+ - The text with the date you'd like to parse, e.g., `"2017-01-06"`.
+### formatText ( text, required )
+ - The text identifying the format to parse, e.g., `"yyyy-mm-dd"`.
+ - Valid identifiers are as follows.
+   - Year: yyyy (4-digit numeric), yy (2-digit numeric)
+   - Month: mm (2-digit numeric), m (1-digit numeric)
+   - Day: dd (2-digit numeric), d (1-digit numeric)
+
+
+## USAGE
+```
+date.GetFromFormat ( "2017-01-06" ; "yyyy-mm-dd" ) /** = Date ( 01 ; 06 ; 2017 ) **/
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Jan 16, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Initial version only supports numeric dates (i.e., no named months)
+
+**/
+
+Let (
+[   ~dateText = "2017-1-7"
+;   ~formatText = "yyyy-m-d"
+
+;   ~countYearDigits = Case 
+    (   Position ( ~formatText ; "yyyy" ; 0 ; 1 )
+    ;       4
+
+    ;   Position ( ~formatText ; "yy" ; 0 ; 1 )
+    ;       2
+
+    /** ELSE **/
+    ;       0
+    )
+
+;   ~countMonthDigits = Case 
+    (   Position ( ~formatText ; "mm" ; 0 ; 1 )
+    ;       2
+
+    ;   Position ( ~formatText ; "m" ; 0 ; 1 )
+    ;       1
+
+    ;	Position ( ~formatText ; "MM" ; 0 ; 1 )
+    ;		99
+
+    /** ELSE **/
+    ;       0
+    )
+
+;   ~countDayDigits = Case 
+    (   Position ( ~formatText ; "dd" ; 0 ; 1 )
+    ;       2
+
+    ;   Position ( ~formatText ; "d" ; 0 ; 1 )
+    ;       1
+
+    ;	Position ( ~formatText ; "DD" ; 0 ; 1 )
+    ;		99
+
+    /** ELSE **/
+    ;       0
+    )
+
+;	~yearValue = Let (
+	[	~year.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+	;	~year.length = ~countYearDigits
+	;	~year.text = Middle ( ~dateText ; ~year.pos0 ; ~year.length )
+	;	~year.value = Year ( Date ( 1 ; 1 ; ~year.text ) )
+	]
+	;	~year.value
+	)
+
+;	~monthValue = Let (
+	[	~month.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+	;	~month.length = ~countMonthDigits
+	;	~month.text = Middle ( ~dateText ; ~month.pos0 ; ~month.length )
+	;	~month.value = Month ( Date ( ~month.text ; 1 ; 2017 ) ) )
+	]
+	;	~month.value
+	)
+
+;	~dayValue = Let (
+	[	~day.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+	;	~day.length = ~countDayDigits
+	;	~day.text = Middle ( ~dateText ; ~day.pos0 ; ~day.length )
+	;	~day.value = Year ( Date ( 1 ; ~day.text ; 2017 ) )
+	]
+	;	~day.value
+	)
+
+;	~dateValue = Date ( ~monthValue ; ~dayValue ; ~yearValue )
+
+;   ~returnValue = ~yearValue
+]
+;   ~returnValue
+)

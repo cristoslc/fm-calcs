@@ -1,0 +1,76 @@
+/** 
+# FilterListItems_Filtrate.cf ( SourceList ; ValuesToDeduct )
+ - Custom function to examine two lists, and return only the 
+   values from the first list (SourceList) *not* found on the second 
+   list (ValuesToDeduct) i.e. the opposite of FM's `FilterValues ( )` function.
+ - Originally by jej@igeek.co.uk 30/7/12
+
+
+## PARAMETERS
+### SourceList ( text, required )
+ - The list with all values, from which some will be deducted.
+ ### ValuesToDeduct ( text, required )
+ - The list with the values you want to eliminate from the SourceList.
+
+
+## USAGE
+```
+Let (
+[	$listFoods = List ( "Apples" ; "Bananas" ; "Cherries" ) 
+;	$listYellowFoods = "Bananas" 
+;	$listNonYellowFoods = FilterListItems_Filtrate.cf ( $listFoods ; $listYellowFoods )
+]
+;	$listNonYellowFoods
+)
+```
+- $listNonYellowFoods = List ( "Apples" ; "Cherries" )
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 Feb 13, 2017
+ - Downloaded from [http://www.briandunning.com/cf/1588](http://www.briandunning.com/cf/1588) 
+   by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let(
+[	~SourceList = SourceList
+;	~ValuesToDeduct = ValuesToDeduct
+
+;	~Length = ValueCount( ~SourceList ) 
+;	~ThisValue = GetValue( ~SourceList ; 1 )
+
+	// Add the value to the output, if applicable
+;	$$TEMPFILTERITEMLIST = If
+	(	not PatternCount ( ¶ &  ~ValuesToDeduct  & ¶ ; ¶ & ~ThisValue & ¶ ) 
+	; 		$$TEMPFILTERITEMLIST  & ~ThisValue  & ¶
+
+	/**	ELSE **/
+	;	$$TEMPFILTERITEMLIST  
+	)
+
+
+	// shorten the list
+;	~NewList = If
+	(	~Length > 1 ; RightValues ( ~SourceList; ~Length - 1) 
+	;		""
+	)
+
+;	result = If
+	(	// if there's still values to go
+		ValueCount ( ~NewList ) > 0 
+	;	  	~ValuesToDeductItems_Filtrate.cf( ~NewList ; ~ValuesToDeduct )
+	
+	/** else finish -- remove trailing ¶ **/
+	;		Left( $$TEMPFILTERITEMLIST ; Length( $$TEMPFILTERITEMLIST ) - 1 )
+	)
+
+	// tidy up 
+;	$$TEMPFILTERITEMLIST = ""
+]
+;	result
+)

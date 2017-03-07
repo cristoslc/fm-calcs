@@ -1,0 +1,121 @@
+/** 
+# convert.fmToWord2003 ( input )
+ - Generates Microsoft Word 2003 XML Documents from FileMaker.
+ - Export result into a textfile with extension `.xml` or `.doc` 
+ 	and it can be opened in MS Word, OpenOffice, Libre Office, etc.
+
+
+## PARAMETERS
+### input ( text, required )
+ - A block of text using the markup conventions of this calculation
+ 	that you want to convert to Word 2003 XML output.
+
+
+## USAGE
+```
+Set Field [ Letters::xmlWordDocument ; Value: convert.fmToWord2003 ( $converterMarkup ) ]
+```
+
+ 
+## REQUIRES
+ - none
+
+## NOTES
+The expected input is a text with tags:
+ - #<p># - start paragraph
+ - #</p># - end paragraph
+ - #</p><p># - end + start paragraph
+
+ - #<table># - tables
+ - #</table>#
+ - #<table-row>#
+ - #</table-row>#
+ - #<table-cell>#
+ - #</table-cell>#
+
+ - #<section># - section break, continuous no new page
+ - #<section-2-col># - section break starting two column page layout
+ - #<section-3-col># - section break starting three column page layout
+
+ - #<b># - bold
+ - #</b>#
+ - #<i># - italics
+ - #</i>#
+
+ - #<pict>#
+ - #</pict>#
+
+ 
+## CHANGELOG
+### v1.1 February 8, 2017
+ - Downloaded from https://www.briandunning.com/cf/1765 by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Minor reformatting for readability.
+
+### v1.0 June 4, 2015
+ - Published by [Jens Teich, DJTO](http://jensteich.de) at http://jensteich.de/2015/06/filemaker-custom-function-fm2word/.
+
+**/
+
+Let(
+[	styles= "<w:styles>" &
+
+	"<w:style w:type='paragraph' w:styleId='FileMakersHomebrew'>" &
+	"<w:name w:val='FileMakersHomebrew'/>" &
+	"<w:basedOn w:val='Standard'/>" &
+	"<w:rsid w:val='00AF7A99'/>" &
+	"<w:pPr><w:spacing w:line='360' w:line-rule='auto'/></w:pPr><w:rPr>" &
+	"<w:rFonts w:ascii='Garamond' w:h-ansi='Garamond'/>" &
+	"<wx:font wx:val='Garamond'/>" &
+	"<w:color w:val='7030A0'/>" &
+	"<w:sz w:val='24'/>" &
+	"<w:lang w:val='EN-US'/>" &
+	"</w:rPr>" &
+	"</w:style>" &
+
+	"</w:styles>" 
+
+;	include_style_FileMakersHomebrew = ""
+
+; 	header = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>" &
+	"<?mso-application progid='Word.Document'?>" &
+	"<w:wordDocument xmlns:w='http://schemas.microsoft.com/office/word/2003/wordml' " &
+	"xmlns:wx='http://schemas.microsoft.com/office/word/2003/auxHint' " &
+	"xmlns:v='urn:schemas-microsoft-com:vml' " &"
+	xmlns:o='urn:schemas-microsoft-com:office:office'>" 
+
+; 	footer = "</w:body></w:wordDocument>"
+
+]
+;	List
+	(	header 
+	;	styles 
+
+	;	"<w:body>" 
+
+	;	Substitute 
+		( 	input 
+		;	["¶" ; "" ];["'" ; "\"" ] 
+		;	["#<p>#";"<w:p><w:r><w:t>"] 
+		;	["#</p>#";"</w:t></w:r></w:p>"] 
+		;	["#</p><p>#";"</w:t></w:r></w:p><w:p><w:r><w:t>"] 
+		;	["#<p-Style-FileMaker-Homebrew>#"; "<w:p><w:pPr><w:pStyle w:val='FileMakersHomebrew'/></w:pPr><w:r><w:t>"] 
+		;	["#<table>#";"<w:tbl>"] 
+		;	["#</table>#";"</w:tbl>"] 
+		;	["#<table-row>#";"<w:tr>"] 
+		;	["#</table-row>#";"</w:tr>"] 
+		;	["#<table-cell>#";"<w:tc>"] 
+		;	["#</table-cell>#";"</w:tc>"] 
+		;	["#<section>#";"<w:p><w:pPr><w:sectPr><w:type w:val='continuous'/></w:sectPr></w:pPr></w:p>"] 
+		;	["#<section-2-col>#";"<w:p><w:pPr><w:sectPr><w:type w:val='continuous'/><w:cols w:num='2' w:space='708'/></w:sectPr></w:pPr></w:p>"] 
+		;	["#<section-3-col>#";"<w:p><w:pPr><w:sectPr><w:type w:val='continuous'/><w:cols w:num='3' w:space='708'/></w:sectPr></w:pPr></w:p>"] 
+		;	["#<b>#";"</w:t></w:r><w:r><w:rPr><w:b/></w:rPr><w:t>"] 
+		;	["#</b>#";"</w:t></w:r><w:r><w:t>"] 
+		;	["#<i>#";"</w:t></w:r><w:r><w:rPr><w:i/></w:rPr><w:t>"] 
+		;	["#</i>#";"</w:t></w:r><w:r><w:t>"] 
+		;	["#<pict>#";"<w:pict><v:shape><v:imagedata src='"] 
+		;	["#</pict>#";"'/></v:shape></w:pict>"]
+		) 
+
+	;	footer
+	)
+)

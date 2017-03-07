@@ -1,0 +1,60 @@
+/** 
+# fieldFqName.getField ( fieldFqName )
+ - Given a fully-qualified field name (or field reference), return just the field name (without the table name).
+
+
+## PARAMETERS
+### fieldFqName ( text|field reference, required )
+ - The text name or field reference for a fully-qualified field.
+
+
+## USAGE
+```
+Set Variable [ $fieldName ; Value: fieldFqName.getField ( ShoppingCart::idCustomer ) ]
+```
+ - returns `"idCustomer"`
+ 
+## REQUIRES
+ - `value.isNullOrError()` custom function
+
+ 
+## CHANGELOG
+### v1.0 Jan 31, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~fieldFqNameByRef = GetFieldName ( fieldFqName )
+;   ~fieldFqNameAsText = GetAsText ( fieldFqName )
+;   ~fieldFqName = If 
+    (   not value.isNullOrError ( ~fieldFqNameByRef )
+    ;       ~fieldFqNameByRef
+    
+    /** ELSE **/
+    ;       ~fieldFqNameAsText
+    )
+
+;   ~word0.sourceText = ~fieldFqName 
+;   ~word0.delimiter = "::"
+;   ~word0.delimiter.length = Length ( ~word0.delimiter )
+;   ~word0.pos0 = Position ( ~word0.sourceText ; ~word0.delimiter ; 0 ; 1 ) + ~word0.delimiter.length
+;   ~word0.pos1 = Length ( ~word0.sourceText ) + ~word0.delimiter.length
+;   ~word0.length = ~word0.pos1 - ~word0.pos0
+;   ~word0.value = Middle ( ~word0.sourceText ; ~word0.pos0 ; ~word0.length )
+
+;   ~fieldName = ~word0.value
+
+;   ~returnValue = Case 
+    (
+    /** ERROR CASES **/
+        not ~word0.pos0
+    ;       "? - `" & fieldFqName & "` is not a fully-qualified field name or field reference."
+
+    /** SUCCESS CASES **/
+    /** ELSE **/
+    ;       ~fieldName 
+    )
+]
+;   ~returnValue
+)

@@ -1,0 +1,38 @@
+/** 
+# script.lastError.exists
+ - Returns TRUE if the lastError was greater than 0.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+Perform Find []
+Set Variable [ $~void ; Value: script.setLastError ]
+
+# Do some other stuff
+
+If [ script.lastError.code = 401 ]
+    # Do something if no results were returned.
+Else If [ script.lastError.exists ]
+    # Do something if some other error was returned.
+Else
+    # Do something if the Find succeeded.
+End If
+```
+
+ 
+## REQUIRES
+ - `script.lastError.code` custom function.
+ - `script.setLastError` cf to set the appropriate dictionary.
+
+ 
+## CHANGELOG
+### v1.0 2017-02-28
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+script.lastError.code > 0

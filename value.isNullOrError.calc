@@ -34,9 +34,11 @@ End If
 Let (
 [	~valueToCheck = valueToCheck
 
-;   ~isNull = GetAsBoolean ( IsEmpty ( ~valueToCheck ) )
-;	~isError = GetAsBoolean ( Left ( ~valueToCheck ; 1 ) = "?" )
+;   ~isNull = IsEmpty ( ~valueToCheck )
+;	~isError = Left ( ~valueToCheck ; 1 ) = "?"
 
+/** Enable the following lines for debug purposes. **/
+;	$~value.isNullOrError__valueToCheck = ~valueToCheck
 ;	$~value.isNullOrError__isNull = ~isNull
 ;	$~value.isNullOrError__isError = ~isError
 

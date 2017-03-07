@@ -1,0 +1,57 @@
+/** 
+# dict.zz_util.autocastDatatype ( value )
+ - Attempts to coerce a value of unknown datatype to the correct datatype, automatically.
+ - Datatype prediction shamelessly lifted from https://github.com/filemakerstandards/fmpstandards/blob/master/Functions/%23Name-Value/%23.fmfn
+
+
+## PARAMETERS
+### value ( any datatype, required )
+ - the value you want to coerce
+
+
+## USAGE
+```
+Let ( $castValue = dict.zz_util_autocastDatatype ( $rawValue ) ; $castValue )
+```
+
+ 
+## REQUIRES
+ - None
+
+ 
+## CHANGELOG
+### v1.0 Jan 5, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~sourceValue = value
+;   ~plusOneText = GetAsText ( ~sourceValue + 1 ) 
+;   ~isValidDate = not EvaluationError ( GetAsDate ( ~sourceValue ) ) 
+;   ~isValidTime = not EvaluationError ( GetAsTime ( ~sourceValue ) ) 
+;   ~number = GetAsNumber ( ~sourceValue ) 
+;   ~returnValue = Case 
+    (   ~sourceValue = "" 
+        or Length ( ~sourceValue ) > 3000
+        or ~sourceValue = "?" 
+        or ~number = "?"
+    ;       ~sourceValue
+    ;   ~isValidDate
+        and ~isValidTime
+        and GetAsText ( GetAsTimestamp ( ~sourceValue ) + 1 ) = ~plusOneText 
+    ;       GetAsTimestamp ( ~sourceValue )
+    ;   ~isValidTime
+        and GetAsText ( GetAsTime ( ~sourceValue ) + 1 ) = ~plusOneText 
+    ;       GetAsTime ( ~sourceValue )
+    ;   ~isValidDate
+        and GetAsText ( GetAsDate ( ~sourceValue ) + 1 ) = ~plusOneText 
+    ;       GetAsDate ( ~sourceValue )
+    ;   ~sourceValue ≠ ~number 
+    ;       ~sourceValue
+    //  ELSE
+    ;       ~number
+    ) 
+]
+;   ~returnValue
+)
