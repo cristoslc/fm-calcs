@@ -23,6 +23,9 @@ End If
 
  
 ## CHANGELOG
+### v1.1 2017-03-10
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Changed minimum version to 13.02 based on feedback that PSOS had bugs prior to that version.
 ### v1.0 Feb 16, 2017
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
@@ -40,10 +43,15 @@ Let (
 ;	~isPsosDebugDisabled = $$debug__isDisablePsos
 
 ;	~isPsosEnabled = 
+		/** Check Preferences and Debug status. **/
 		~isPsosPrefEnabled
 		and not ~isPsosDebugDisabled
+
+		/** Check Host compatibility. **/
 		and ~isHostServer
-		and ~hostVersion > 13
+		and ~hostVersion > 13.02
+
+		/** Check Client compatibility. **/
 		and not ~isClientServer
 		and not ~isClientRuntime
 		and ~clientVersion > 13

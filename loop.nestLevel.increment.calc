@@ -1,0 +1,49 @@
+/** 
+# loop.nestLevel.increment
+ - Increases the nestLevel for loops. Do this immediately before starting an inner loop.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+Set Variable [ $array_2d ; Value: Get2dArray ( $jsonSource ) ]
+Set Variable [ $countRows ; Value: ValueCount ( $array_2d ) ]
+Set Variable [ $countCols ; Value: PatternCount ( $array_2d ; ", " ) + 1 ]
+
+Loop
+    Exit Loop If [ loop.until ( $countRows ) ]
+
+    Set Variable [ $~void ; Value: loop.nestLevel.increment ]
+    Loop
+        Exit Loop If [ loop.until ( $countColumns ) ]
+        
+        Set Variable [ $row ; Value: loop.nestedIteration ( loop.nestLevel.getCurrent - 1 ) ]
+        Set Variable [ $column ; Value: loop.currentIteration ] 
+        Set Variable [ $arrayItem ; Value: GetArrayItem ( $row ; $column ) ]
+
+        # Do something with `$arrayItem`
+        
+    End Loop
+
+End Loop
+```
+
+ 
+## REQUIRES
+ - `loop.nestLevel.getCurrent`
+
+ 
+## CHANGELOG
+### v1.0 2017-04-01
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   $~loop.nestLevel = loop.nestLevel + 1
+]
+;   loop.nestLevel
+)

@@ -87,7 +87,7 @@ Let (
 	[	~month.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
 	;	~month.length = ~countMonthDigits
 	;	~month.text = Middle ( ~dateText ; ~month.pos0 ; ~month.length )
-	;	~month.value = Month ( Date ( ~month.text ; 1 ; 2017 ) ) )
+	;	~month.value = Month ( Date ( ~month.text ; 1 ; 2017 ) )
 	]
 	;	~month.value
 	)
@@ -96,14 +96,14 @@ Let (
 	[	~day.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
 	;	~day.length = ~countDayDigits
 	;	~day.text = Middle ( ~dateText ; ~day.pos0 ; ~day.length )
-	;	~day.value = Year ( Date ( 1 ; ~day.text ; 2017 ) )
+	;	~day.value = Day ( Date ( 1 ; ~day.text ; 2017 ) )
 	]
 	;	~day.value
 	)
 
 ;	~dateValue = Date ( ~monthValue ; ~dayValue ; ~yearValue )
 
-;   ~returnValue = ~yearValue
+;   ~returnValue = ~dateValue
 ]
 ;   ~returnValue
 )

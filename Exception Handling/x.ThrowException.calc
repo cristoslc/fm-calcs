@@ -37,9 +37,18 @@ End Loop
 # REQUIRES
  - `#()`
  - `#GetNameList()`
+ - x.thrownException
+ - `x.localExceptions.add()`
+ - `x.localExceptions.increment`
 
  
 # CHANGELOG
+## v1.2 2017-03-31
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Added new functions for collectiong Exceptions (all `x.localExceptions` CFs ).
+## v1.1 2017-03-10
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Added more variants of `scriptSection` local variable detection.
 ## v1.0 Oct 12, 2016
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
@@ -73,7 +82,10 @@ Let ([
 ;	$x.thrownException = 
 		# ( "code" ; ~code )
 	& 	# ( "message" ; ~message )
-	& 	# ( "scriptSection" ; $scriptSection )
+	& 	# 
+		( 	"scriptSection" 
+		; 	List ( $~script.section ; $~scriptSection ; $scriptSection ) /** Accept multiple variants of local variable, for backwards-compatibility. **/
+		)
 	& 	# ( "scriptStack" ; ~scriptStack )
 	& 	Case 
 		(	IsEmpty ( ~rootException )
@@ -82,7 +94,11 @@ Let ([
 		/**	DEFAULT **/
 		;		# ( "rootException" ;	~rootException )
 		)
+	& # ( "countLocalExceptions" ; x.localExceptions.increment ) /** Include number of other Exceptions that have been thrown in this scope. **/
+	& # ( "localExceptions" ; x.localExceptions ) /** Include contents of other Exceptions that have been thrown in this scope, except for this one right now. **/
+
+;	~void = x.localExceptions.add ( x.thrownException ) /** Can't add the new Exception until its been set. **/
 ];
 
-	$x.thrownException 
+	x.thrownException 
 )

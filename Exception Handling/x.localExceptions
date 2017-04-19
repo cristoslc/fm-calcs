@@ -1,0 +1,29 @@
+/** 
+# x.localExceptions
+ - Returns the collection of Exception objects that have been thrown.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+If [ x.localExceptions.count > 1 ]
+    Set Variable [ $logData; Value: x.localExceptions ]
+    Perform Script [ NEW: Log Entry ( logData ) ; $logData ]
+End If
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-03-31
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+$~script.localExceptions

@@ -1,0 +1,45 @@
+/** 
+# loop.iteration
+ - Returns the current position of the loop iterator.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+Set Variable [ $array_2d ; Value: Get2dArray ( $jsonSource ) ]
+Set Variable [ $countRows ; Value: ValueCount ( $array_2d ) ]
+Set Variable [ $countCols ; Value: PatternCount ( $array_2d ; ", " ) + 1 ]
+
+Loop
+    Exit Loop If [ loop.until ( $countRows ) ]
+
+    Set Variable [ $row ; Value: loop.iteration ]
+
+    Loop
+        Exit Loop If [ loop.until ( $countColumns ) ]
+
+        Set Variable [ $column ; Value: loop.iteration ] 
+        Set Variable [ $arrayItem ; Value: GetArrayItem ( $row ; $column ) ]
+
+        # Do something with `$arrayItem`
+
+    End Loop
+
+End Loop
+```
+
+ 
+## REQUIRES
+ - `loop.nestLevel.getCurrent`
+
+ 
+## CHANGELOG
+### v1.0 2017-04-01
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+$~loop.i[loop.nestLevel.getCurrent]

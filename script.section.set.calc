@@ -1,0 +1,59 @@
+/** 
+# script.section.set ( sectionName )
+ - Sets the active script section name, and 
+
+
+## PARAMETERS
+### sectionName ( text, required )
+ - The name of the new script section
+
+
+## USAGE
+```
+# ****************************
+Set Variable [ $~void ; script.section.set ( "Get Found Set" ) ]
+# ****************************
+Enter Find Mode []
+Set Field [ Invoices::invoiceDate ; "> " & Get ( CurrentDate ) - 1 ]
+Perform Find []
+If [ Get ( LastError ) > 0 and Get ( LastError ) <> 401 ]
+	# Log the error, and include `script.section` so you know where it occurred.
+
+End If
+
+
+# ****************************
+Set Variable [ $~void ; script.section.set ( "Export Found Set" ) ]
+# ****************************
+Export Records [ With Dialog: Off; "$filePath" ; Unicode ( UTF-16 ) ]
+If [ Get ( LastError ) ]
+	# Log the error, and include `script.section` so you know where it occurred.
+
+End If
+```
+
+ 
+## REQUIRES
+ - Other functions, scope conditions, etc.
+
+ 
+## CHANGELOG
+### v1.0 2017-04-12
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~sectionName = sectionName
+;	~scriptName = Get ( ScriptName )
+
+;	$~script.section.previous = $~script.section
+;   $~script.section = ~sectionName
+;	$~script.section.stack = List ( $~script.section.stack ; $~script.section )
+
+;	~callstackEntry = "[" & ~scriptName & "] " & ~sectionName
+
+;   ~returnValue = $~script.section
+]
+;   ~returnValue
+)

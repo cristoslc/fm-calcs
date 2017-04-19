@@ -1,0 +1,26 @@
+/** 
+# x.localExceptions.count
+ - Returns the number of thrown Exceptions in this script (local scope).
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+How do you use this function? Include an example with mock data/code.
+```
+
+ 
+## REQUIRES
+ - Other functions, scope conditions, etc.
+
+ 
+## CHANGELOG
+### v1.0 2017-03-30
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+$~script.localExceptions.count

@@ -1,0 +1,31 @@
+/** 
+# x.localExceptions.add ( dictException )
+ - Adds an Exception to the collection of locally-thrown Exceptions.
+
+
+## PARAMETERS
+### dictException ( text, required )
+ - A dictionary object containing the Exception to add.
+
+
+## USAGE
+ - This function should not be used manually. Instead, it is called
+   automatically as part of `x.ThrowException()`.
+ 
+## REQUIRES
+ - `x.localExceptions.count()`
+
+ 
+## CHANGELOG
+### v1.0 2017-03-31
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   $~script.localExceptions = #set ( $~script.localExceptions ; "exception-" & x.localExceptions.count ; dictException )
+
+;   ~returnValue = $~script.localExceptions
+]
+;   ~returnValue
+)

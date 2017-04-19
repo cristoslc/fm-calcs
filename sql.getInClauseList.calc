@@ -1,18 +1,23 @@
 /** 
-# sql.getInClauseList ( listValues )
- - Takes a return-delimited list of values and converts them to a quoted, Comma-separated list compatible with SQL `WHERE ... IN (...)` clauses.
+# sql.getInClauseList ( listValues ; dataType )
+ - Takes a return-delimited list of values and converts them to a comma-separated list compatible with SQL `WHERE ... IN (...)` clauses.
 
 
 ## PARAMETERS
 ### listValues ( text, required )
  - A carriage-return delimited list of the values which you would like to wrap.
+### dataType ( text, required )
+ - Specifies whether this function should return a text-compatible (i.e., wrapped in `"`) or number-compatible (non-wrapped) list.
+ - MUST be one of the following values (case sensitive):
+   - `number`
+   - `text`
 
 
 ## USAGE
 ```
 Let (
 [	~listValues = List ( "Apples" ; "Bananas" ; "Cherries" )
-;	~sqllistValues = sql.getInClauseList ( ~listValues )
+;	~sqllistValues = sql.getInClauseList ( ~listValues ; "text" )
 ;	~sqlQuery = "SELECT MyField FROM MyTable WHERE MatchField IN ( " & ~sqllistValues & " )"
 ;	~result = ExecuteSQL ( ~sqlQuery ; $null ; $null )
 ]
@@ -26,6 +31,9 @@ Let (
 
  
 ## CHANGELOG
+### v1.1 2017-03-08
+ - Modified by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+ - Added new parameter, `dataType`, & related error handling.
 ### v1.0 2017-03-07
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
@@ -33,8 +41,34 @@ Let (
 
 Let (
 [   ~listValues = listValues
+;	~dataType = Lower ( dataType )
+;	~delimiter = Case 
+	(	~dataType = "number"
+	;		", "
 
-;   ~returnValue = "\"" & Substitute ( ~listValues ; [ "¶" ; "\", \"" ] ) & "\""
+	;	~dataType = "text"
+	;		"\", \""
+
+	/**	ELSE **/
+	;		"? - `dataType` must be either `number` or `text`, not `" & dataType & "`."
+	)
+
+;	~wrappedList = If 
+	(	not ( Left ( ~delimiter ; 1 ) = "?" ) 
+	;		Substitute ( ~listValues ; [ "¶" ; ~delimiter ] )
+	)
+
+;   ~returnValue = Case 
+	(	~dataType = "text"
+	;		"\"" & ~wrappedList & "\""
+
+	;	~dataType = "number"
+	;		~wrappedList
+
+	/**	ELSE: If there was an error, show the error. **/
+	;		~delimiter
+	)
+
 ]
 ;   ~returnValue
 )

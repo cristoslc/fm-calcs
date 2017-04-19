@@ -1,0 +1,30 @@
+/** 
+# x.localExceptions.increment
+ - Sets the value of `x.countExceptions` to a new value. Typically performed when throwing an Exception.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+ - Should not be called manually; is automatically called by `x.throwException()`.
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-03-30
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[  $~script.localExceptions.count = $~script.localExceptions.count + 1
+
+;   ~returnValue = $~script.localExceptions.count
+]
+;   ~returnValue
+)

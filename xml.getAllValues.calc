@@ -1,0 +1,107 @@
+/** 
+# xml.getAllValues ( xmlSource ; xmlEntityName ; optional_delimiter )
+ - Returns a `delimiter`-delimited list with the value for every instance of `xmlEntityName` found in `xmlSource`.
+
+
+## PARAMETERS
+### xmlSource ( text, required )
+ - The raw XML from which you want to extract values.
+
+### xmlEntityName ( text, required )
+ - The name of the XML entity to find.
+
+### delimiter ( text, optional )
+ - The delimiter to use in between list values.
+ - Defaults to '¶' if not specified.
+
+
+## USAGE
+```
+Set Variable [ $listNames ; xml.getAllValues ( $apiXmlResult ; "name" ; $null ) ]
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-04-05
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~xmlSource = xmlSource
+;	~xmlEntity = xmlEntityName
+
+;	~isFirstValueFound = not $~xml.getAllValues__isFirstValueFound
+;	~delimiter = 
+		Case 
+		(	not ~isFirstValueFound
+		;		$null /** Don't use a delimiter on the first value. **/
+
+		;	IsEmpty ( optional_delimiter ) 
+		;		"¶"
+
+		/**	ELSE **/
+		;		optional_delimiter
+		)
+
+/** Grab a chunk to work on. **/
+;	~segment0.start = 1
+;	~segment0.end = Position ( ~xmlSource ; "</" ; ~segment0.start ; 10 ) + 1
+;	~segment0.length = ~segment0.end - ~segment0.start
+;	~segment0.value = 
+		If 
+		(	~segment0.end > 0
+		;		Middle ( ~xmlSource ; ~segment0.start ; ~segment0.length )
+		/**	ELSE **/
+		;		$null
+	)
+
+/** Look for the XML entity in that chunk. **/
+;	~xmlEntity.searchString = "<" & ~xmlEntity
+;	~xmlEntity.isFound = Position ( ~segment0.value ; ~xmlEntity.searchString ; 0 ; 1 ) > 0
+;	~xmlEntityValue.start = Position ( ~segment0.value ; ~xmlEntity.searchString ; 0 ; 1 ) + Length ( ~xmlEntity.searchString ) + 1
+;	~xmlEntityValue.end = Position ( ~segment0.value ; "<" ; ~xmlEntityValue.start ; 1 )
+;	~xmlEntityValue.length = ~xmlEntityValue.end - ~xmlEntityValue.start
+;	~xmlEntityValue.value = 
+		If 
+		(	~xmlEntity.isFound
+		;		~delimiter & Middle ( ~segment0.value ; ~xmlEntityValue.start ; ~xmlEntityValue.length )
+		/**	ELSE **/
+		;		$null
+		)
+;	$~xml.getAllValues__isFirstValueFound = 
+		If 
+		(	~xmlEntity.isFound
+			or ~isFirstValueFound
+		;		True /** Set a flag for further recursions to obey if we found a match. **/
+		)
+
+/** Get the next chunk, to pass on to the recursion if necessary. **/
+;	~nextXmlSource.start =
+		If 
+		(	~xmlEntity.isFound 
+		;		~xmlEntityValue.end + 1	/** If there was a match, don't skip the rest of the segment. **/
+		/**	ELSE **/
+		;		~segment0.end + 1	/** If there were no matches, continue from the end of the segment. **/
+		)
+;	~nextXmlSource.end = Length ( ~xmlSource )
+;	~nextXmlSource.length = ~nextXmlSource.end - ~nextXmlSource.start
+;	~nextXmlSource.value = 
+		If 
+		(	~nextXmlSource.start > 0
+		;		Middle ( ~xmlSource ; ~nextXmlSource.start ; ~nextXmlSource.length )
+		/**	ELSE **/
+		;		$null
+		)
+
+]
+;   ~xmlEntityValue.value
+	& If 
+	( 	not IsEmpty ( ~nextXmlSource.value )
+	;		xml.getAllValues ( ~nextXmlSource.value ; ~xmlEntity ; ~delimiter )
+	)
+)

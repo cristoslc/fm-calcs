@@ -1,0 +1,54 @@
+/** 
+# loop.nestLevel.decrement
+ - Decreases the nestLevel for loops. This is handled by `loop.until()` and you should not need to call it manually.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+Set Variable [ $array_2d ; Value: Get2dArray ( $jsonSource ) ]
+Set Variable [ $countRows ; Value: ValueCount ( $array_2d ) ]
+Set Variable [ $countCols ; Value: PatternCount ( $array_2d ; ", " ) + 1 ]
+
+Loop
+    Exit Loop If [ loop.until ( $countRows ) ]
+
+    Set Variable [ $~void ; Value: loop.nestLevel.increment ]
+    Loop
+        Exit Loop If [ loop.until ( $countColumns ) ]
+        
+        Set Variable [ $row ; Value: loop.nestedIteration ( loop.nestLevel - 1 ) ]
+        Set Variable [ $column ; Value: loop.currentIteration ] 
+        Set Variable [ $arrayItem ; Value: GetArrayItem ( $row ; $column ) ]
+
+        # Do something with `$arrayItem`
+        
+    End Loop
+
+End Loop
+```
+
+ 
+## REQUIRES
+ - `loop.nestLevel`
+
+ 
+## CHANGELOG
+### v1.0 2017-04-01
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   $~loop.nestLevel = Case 
+	(	loop.nestLevel > 1
+	;		loop.nestLevel - 1 /** Decrease the nestLevel if it's greater than `1`. **/
+	/**	ELSE **/
+	;		$null /** If the nestlevel is at `1`, then clear it. **/
+	)
+]
+;   loop.nestLevel
+)

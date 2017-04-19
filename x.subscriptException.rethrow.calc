@@ -20,7 +20,7 @@ Loop
     Perform Script [ "Export Customer Invoice to PDF > filePath" ; Parameter: $idCustomerInvoice ]
     Exit Loop If [ x.subscriptException.rethrow ]
 
-    Exit Loop If [ True /** Always exit single-pass loop. **/]
+    Exit Loop If [ True // Always exit single-pass loop.]
 End Loop
 
 If [ x.thrownException.exists ]

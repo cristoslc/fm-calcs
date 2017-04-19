@@ -30,7 +30,7 @@ End If
 
 Let (
 [   ~fieldFqName = GetFieldName ( fqFieldObject )
-	~fieldFqName = Case 
+;	~fieldFqName = Case 
 	(	Left ( ~fieldFqName ; 1 ) = "?"
 		or IsEmpty ( ~fieldFqName )
 	;		fqFieldObject /** If `GetFieldName()` fails, try treating it as text. **/

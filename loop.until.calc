@@ -1,0 +1,63 @@
+/** 
+# loop.until ( iteratorMax )
+ - Tracks the iterator for a loop, returns `True` if the 
+
+
+## PARAMETERS
+### iteratorMax ( number, required )
+ - The highest number to which the iterator should count. (i.e., set it to `5` if you want the loop to run 5 times)
+
+
+## USAGE
+```
+Set Variable [ $countCustomers ; Value: ValueCount ( $idlistCustomers ) ] 
+Loop
+	Exit Loop If [ loop.until ( $idlistCustomers ) ]
+	Set Variable [ $idCustomer ; Value: GetValue ( $idlistCustomers ; loop.iteration ) ]
+
+	# Do something with $idCustomer here.
+
+End Loop
+```
+
+ 
+## REQUIRES
+ - `loop.iteration`
+ - `loop.nestLevel`
+
+ 
+## CHANGELOG
+### v1.0 2017-03-31
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[	~iMax = iteratorMax
+
+;	~void = If
+	(	IsEmpty ( loop.nestLevel )
+	;		loop.nestLevel.increment
+	)
+
+;	$~loop.iMax[loop.nestLevel] = ~iMax
+
+;	$~loop.i[loop.nestLevel] = loop.iteration + 1 /** Start the iterator at `1` and step by 1. **/
+];
+	If 
+	(	loop.iteration > $~loop.iMax[loop.nestLevel]
+	;      	Let (
+	       	[	/** Clean up unused variables. **/
+	       		$~loop.i[loop.nestLevel] = $null
+	       	;	$~loop.iMax[loop.nestLevel] = $null 
+
+	       		/** Manage loop nesting. **/
+	       	;	~void = loop.nestLevel.decrement
+	       	]
+			;   True /** Return `True` so that `Exit Loop If` will be triggered. **/
+	    	)
+
+	/**	ELSE **/
+	;		False /** Return `False` so that the loop will not exit. **/
+	)
+)

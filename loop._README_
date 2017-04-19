@@ -1,0 +1,49 @@
+/** 
+# loop._README_
+
+## About This Namespace
+ - The `loop.` namespace is reserved for functions that handle iterating inside of loops.
+
+## Usage
+### Example 1
+```
+Perform Find [ Restore ]
+Go To Record [ First ]
+
+Set Variable [ $fieldNames ; FieldNames ( Get ( FileName ) ; Get ( LayoutName ) ) ]
+
+# Loop over Records
+Loop
+    Exit Loop If [ loop.until ( Get ( RecordCount ) ) ]
+
+    # Loop over Fields
+    Set Variable [ $~void ; Value: loop.nestLevel.increment ]
+    Loop
+        Exit Loop If [ loop.until ( ValueCount ( $fieldNames ) ) ]
+        Set Variable [ $fieldName ; Value: GetValue ( $fieldNames ; loop.iterator ) ]
+
+        Set Variable [ $recordNumber ; Value: 100 * loop.iteration.getNestedIteration ( loop.nestLevel - 1 ) /** Get the iteration number of the parent loop. Multiply by 100 to provide enough space for storing fields (values 1-99, 101-199, etc. will be used to keep track of fields). **/ ]
+        Set Variable [ $fieldNumber ; Value: loop.iterator /** Assumes no more than 99 fields on the layout. **/ ]
+        Set Variable [ $repetition ; Value: $recordNumber + $fieldNumber ]
+
+        Set Variable [ $$storedValue[$repetition] ; Value: GetField ( $fieldName ) ]
+
+
+    End Loop
+
+    # Go to Next Record but do not check `Exit After Last` to avoid throwing an unnecessary error.
+    Go To Record [ Next ]
+
+End Loop
+```
+ - This example illustrates how to use nested loops to copy the contents of every visible field (on the current layout)
+   for a given Found Set into global variables.
+
+ 
+## CHANGELOG
+### v1.0 2017-04-02
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+$null

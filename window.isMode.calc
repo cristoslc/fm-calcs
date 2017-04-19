@@ -31,7 +31,7 @@ End If
 
 Let (
 [   ~modeNameOrNumber = Lower ( modeNameOrNumber )
-	~modeNumber = Case 
+;	~modeNumber = Case 
 	(	~modeNameOrNumber = "browse"
 	;		0
 
@@ -51,7 +51,7 @@ Let (
 	;	GetAsNumber ( ~modeNameOrNumber )
 	)
 
-	~currentWindowMode = Get ( WindowMode )
+;	~currentWindowMode = Get ( WindowMode )
 
 ;   ~returnValue = Case
 	(	/** Error Checking **/
