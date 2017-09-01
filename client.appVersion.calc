@@ -1,0 +1,32 @@
+/** 
+# client.appVersion
+ - Returns the version number of the current FileMaker client.
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+How do you use this function? Include an example with mock data/code.
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-04-26
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~fmAppVer = Get ( ApplicationVersion )
+
+;   ~returnValue = GetAsNumber ( ~fmAppVer )
+]
+;   ~returnValue
+)

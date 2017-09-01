@@ -22,7 +22,7 @@
 Let (
 [   ~valuesToCheckUniqueness = List ( "A" ; "B" ; "C" ; "C" ; "D" ; "A" ; "B" ; "C" )
 ;   ~valuesToReturn = List ( "Alpha" ; "Bravo" ; "Charlie" ; "Charlie" ; "Delta" ; "Alpha" ; "Bravo" ; "Charlie" )
-;   ~lookedUpValues = list.lookupOnUniqueValues ( ~valuesToReturn ; ~valuesToCheckUniqueness ; "" )
+;   ~lookedUpValues = list.lookupOnUniqueValues ( ~valuesToReturn ; ~valuesToCheckUniqueness ; $null )
 ]
 //  RESULT
 ;   ~lookedUpValues // = List ( "Alpha" ; "Bravo" ; "Charlie" ; "Delta" ) 

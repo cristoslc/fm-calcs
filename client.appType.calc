@@ -1,0 +1,60 @@
+/** 
+# client.appType
+ - Returns the name of the client type (e.g., "Pro", "Server", "Go", etc.)
+    - `go` for FileMaker Go on iPhone, iPod touch, or iPad
+    - `pro` for FileMaker Pro or Pro Advanced
+    - `runtime` for FileMaker Runtime
+    - `wpe` for FileMaker Server Web Client
+    - `xdbc` for xDBC Client
+    - `server` for FileMaker Server
+
+
+## PARAMETERS
+### none
+
+
+## USAGE
+```
+If [ client.appType = "pro" or client.appType = "runtime" or client.appType = "go"]
+	# Do this if the client is running on a user's workstation or phone/tablet.
+Else
+	# Do this if the client is running in a virtual session on a server or via xDBC.
+End If
+```
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-04-21
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~fmAppVer = Get ( ApplicationVersion )
+
+;   ~returnValue = Case 
+	(	Position ( ~fmAppVer ; "Go" ; 0 ; 1 )
+	;		"go"
+
+	;	Position ( ~fmAppVer ; "Server" ; 0 ; 1 )
+	;		"server"
+
+	;	Position ( ~fmAppVer ; "xDBC" ; 0 ; 1 )
+	;		"xdbc"
+
+	;	Position ( ~fmAppVer ; "Web Publishing Engine" ; 0 ; 1 )
+	;		"wpe"
+
+	;	Position ( ~fmAppVer ; "Runtime" ; 0 ; 1 )
+	;		"runtime"
+
+	;	Position ( ~fmAppVer ; "Pro" ; 0 ; 1 )
+	;		"pro"
+	)
+]
+;   ~returnValue
+)

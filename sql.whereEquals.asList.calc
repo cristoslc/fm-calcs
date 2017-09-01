@@ -1,0 +1,41 @@
+/** 
+# sql.whereEquals.asList ( fqFieldToReturn ; fqFieldToMatch ; valueToMatch )
+ - Syntactic sugar for performing a basic SQL query of the 
+ 	structure `SELECT <<fieldToReturn's field>> FROM <<fieldToReturn's table>> WHERE <<fieldToMatch>> = <<valueToMatch>>`.
+ - Returns the results as a Carriage Return-delimited list, instead of using `sql.row.delimiter`
+
+
+## PARAMETERS
+### fqFieldToReturn ( field reference )
+ - A FileMaker reference to the field whose value you want returned from the query.
+### fqFieldToMatch ( field reference )
+ - A FileMaker reference to the field whose value should match `valueToMatch`.
+### valueToMatch ( text|number )
+ - The value to look for in fqFieldToMatch
+
+## USAGE
+```
+sql.whereEquals.asList ( Customers::NameFull ; Customers::idCustomer ; $idCustomer )
+```
+- returns the contents of NameFull for the given $idCustomer via ExecuteSQL
+
+```
+sql.whereEquals.asList ( Customers::idCustomer ; Customers::state ; "NY" )
+```
+ - returns the ID of all customers in New York state
+
+ 
+## REQUIRES
+ - sql.whereEquals CF
+
+ 
+## CHANGELOG
+### v1.0 September 1, 2017
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com). 
+
+**/
+
+Substitute 
+(	sql.whereEquals ( fqFieldToReturn ; fqFieldToMatch ; valueToMatch )
+;	[ sql.row.delimiter ; "¶" ]
+)

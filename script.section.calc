@@ -1,6 +1,6 @@
 /** 
-# script.section.set ( sectionName )
- - Sets the active script section name and builds a more detailed call stack for debugging.
+# script.section
+ - Returns the name of the current script section
 
 
 ## PARAMETERS
@@ -25,34 +25,13 @@ End If
 
  
 ## REQUIRES
- - script.profile.poll
- - script.profile.elapsedSectionTime
+ - none
 
  
 ## CHANGELOG
-### v1.0 2017-04-12
+### v1.0 2017-04-20
  - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
 
 **/
 
-Let (
-[	~sectionName = sectionName
-;	~scriptName = Get ( ScriptName )
-;	~callstackEntry = "[" & ~scriptName & "] " & ~sectionName
-
-;	$~script.section.previous = $~script.section
-;   $~script.section = ~sectionName
-
-;	$~script.stack.count = $~script.stack.count + 1
-
-;	~lastRep = $~script.stack.count - 1
-;	$$~script.stack[~lastRep] = $$~script.stack[~lastRep] & "(" & script.profile.elapsedSectionTime & " ms)"
-
-;	~currentRep = $~script.stack.count
-;	$$~script.stack[~currentRep] = ~callstackEntry
-
-
-;   ~returnValue = $~script.section
-]
-;   ~returnValue
-)
+$~script.section

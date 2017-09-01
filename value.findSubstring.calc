@@ -1,0 +1,90 @@
+/** 
+# value.findSubstring ( sourceText ; startingDelimiter ; endingDelimiter ; isIncludeStartingDelimiter ; isIncludeEndingDelimiter )
+ - Gets a substring of any length from `sourceText` in between `startingDelimiter` and `endingDelimiter`
+
+
+## PARAMETERS
+### sourceText ( text, required )
+ - The string within which to search for the substring.
+
+### startingDelimiter ( text, required )
+ - The string that indicates the beginning of the substring you want.
+
+### sourceText ( text, required )
+ - The string that indicates the end of the substring you want.
+
+### isIncludeStartingDelimiter ( boolean, optional )
+ - Defaults to FALSE
+ - TRUE if you want the starting delimiter returned in the result.
+
+### isIncludeEndingDelimiter ( boolean, optional )
+ - Defaults to FALSE
+ - TRUE if you want the ending delimiter returned in the result.
+
+
+## USAGE
+```
+value.findSubstring ( "'Twas brillig, and the slithy toves" ; ", " ; " " ; False ; False )
+```
+- returns `and`
+
+ 
+## REQUIRES
+ - none
+
+ 
+## CHANGELOG
+### v1.0 2017-07-17
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+Let (
+[   ~segment0.sourceText = sourceText
+;   ~segment0.searchTextStart = startingDelimiter
+;   ~segment0.searchTextEnd = endingDelimiter
+
+;	~isIncludeStartingDelimiter = isIncludeStartingDelimiter
+;	~isIncludeEndingDelimiter = isIncludeEndingDelimiter
+
+;   ~segment0.start = Position ( ~segment0.sourceText ; ~segment0.searchTextStart ; 0 ; 1)
+;   ~segment0.start = Case 
+    (   ~segment0.start > 0
+    ;       ~segment0.start 
+    		+ If 
+    		(	~isIncludeStartingDelimiter
+    		;		0
+    		//	ELSE
+			;		Length ( ~segment0.searchTextStart )
+    		) 
+    /** ELSE **/
+    ;       1
+    )
+
+;   ~segment0.end = Position ( ~segment0.sourceText ; ~segment0.searchTextEnd ; ~segment0.start ; 1 )
+;   ~segment0.end = Case 
+    (   ~segment0.end > 0
+    ;       ~segment0.end
+    		- If 
+    		(	~isIncludeEndingDelimiter
+    		;		0
+    		//	ELSE
+    		;		1
+    		)
+    /** ELSE **/
+    ;       Length ( ~segment0.sourceText )
+    		+ If
+    		(	~isIncludeStartingDelimiter
+    		;		0
+    		//	ELSE
+    		;		Length ( ~segment0.searchTextStart )
+    		)
+    )
+
+;   ~segment0.length = ~segment0.end - ~segment0.start
+;   ~segment0.value = Middle ( ~segment0.sourceText ; ~segment0.start ; ~segment0.length )
+
+;   ~returnValue = ~segment0.value
+]
+;   ~returnValue
+)
