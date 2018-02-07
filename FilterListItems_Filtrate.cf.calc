@@ -23,7 +23,7 @@ Let (
 ;	$listNonYellowFoods
 )
 ```
-- $listNonYellowFoods = List ( "Apples" ; "Cherries" )
+- `$listNonYellowFoods = List ( "Apples" ; "Cherries" )`
 
  
 ## REQUIRES

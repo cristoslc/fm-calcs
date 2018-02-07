@@ -1,0 +1,46 @@
+/*
+list.AddRemoveListItems ( values ; valuesToRemove )
+Adapted from function by: David Head, uLearnIT
+theList: standard return separated list
+theValues: text
+
+This function will add an item to a list if it does not already exist; 
+otherwise the item is removed from the list
+
+Always removes empty lines from list, 
+including leading/trailing returns
+
+Simply remove empty lines from list:
+AddRemoveListItems ( theList; "") 
+
+Recursive: theValues can be a list of values
+Each will be processed in sequence
+
+By Bruce Robertson 6/19/10
+V 1.01
+*/
+
+Let (
+[	theList = Values ;
+	theValues = ValuesToRemove ;
+	LV = ValueCount( theValues);
+	thisValue= GetValue( theValues; 1);
+	moreValues = MiddleValues( theValues ; 2; ValueCount( theValues));
+	novalue = IsEmpty ( FilterValues ( theList ; thisValue ) );
+	newList = Substitute( theList;  ["¶¶¶"; "¶"] ; ["¶¶"; "¶"] ) ;
+	listminusvalue = Substitute( "¶¶" & newList & "¶¶"; [¶ & thisValue & ¶ ; ¶ ] ; ["¶¶¶"; ""] ; ["¶¶"; ""] ) ;
+	listplusvalue = Substitute( List ( newList ; thisValue ); ["¶¶"; "¶"] );
+	result = Case ( novalue ; listplusvalue ; listminusvalue );
+
+	LNR = Length( result );
+	TR = Right( result; 1) = "¶";
+	LR = Left ( result; 1) = "¶";
+	result = Middle ( result; 1+ LR; LNR - TR - LR )
+]
+;	Case
+	( 	LV < 2 
+	; 		result
+	/**	ELSE **/
+	; 		AddRemoveListItems( result; moreValues)
+	)
+)

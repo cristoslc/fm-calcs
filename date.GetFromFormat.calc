@@ -32,8 +32,8 @@ date.GetFromFormat ( "2017-01-06" ; "yyyy-mm-dd" ) /** = Date ( 01 ; 06 ; 2017 )
 **/
 
 Let (
-[   ~dateText = "2017-1-7"
-;   ~formatText = "yyyy-m-d"
+[   ~dateText = dateText
+;   ~formatText = formatText
 
 ;   ~countYearDigits = Case 
     (   Position ( ~formatText ; "yyyy" ; 0 ; 1 )
@@ -53,8 +53,8 @@ Let (
     ;   Position ( ~formatText ; "m" ; 0 ; 1 )
     ;       1
 
-    ;	Position ( ~formatText ; "MM" ; 0 ; 1 )
-    ;		99
+    ;   Position ( ~formatText ; "MM" ; 0 ; 1 )
+    ;       99
 
     /** ELSE **/
     ;       0
@@ -67,41 +67,41 @@ Let (
     ;   Position ( ~formatText ; "d" ; 0 ; 1 )
     ;       1
 
-    ;	Position ( ~formatText ; "DD" ; 0 ; 1 )
-    ;		99
+    ;   Position ( ~formatText ; "DD" ; 0 ; 1 )
+    ;       99
 
     /** ELSE **/
     ;       0
     )
 
-;	~yearValue = Let (
-	[	~year.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
-	;	~year.length = ~countYearDigits
-	;	~year.text = Middle ( ~dateText ; ~year.pos0 ; ~year.length )
-	;	~year.value = Year ( Date ( 1 ; 1 ; ~year.text ) )
-	]
-	;	~year.value
-	)
+;   ~yearValue = Let (
+    [   ~year.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+    ;   ~year.length = ~countYearDigits
+    ;   ~year.text = Middle ( ~dateText ; ~year.pos0 ; ~year.length )
+    ;   ~year.value = Year ( Date ( 1 ; 1 ; ~year.text ) )
+    ]
+    ;   ~year.value
+    )
 
-;	~monthValue = Let (
-	[	~month.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
-	;	~month.length = ~countMonthDigits
-	;	~month.text = Middle ( ~dateText ; ~month.pos0 ; ~month.length )
-	;	~month.value = Month ( Date ( ~month.text ; 1 ; 2017 ) )
-	]
-	;	~month.value
-	)
+;   ~monthValue = Let (
+    [   ~month.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+    ;   ~month.length = ~countMonthDigits
+    ;   ~month.text = Middle ( ~dateText ; ~month.pos0 ; ~month.length )
+    ;   ~month.value = Month ( Date ( ~month.text ; 1 ; 2017 ) )
+    ]
+    ;   ~month.value
+    )
 
-;	~dayValue = Let (
-	[	~day.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
-	;	~day.length = ~countDayDigits
-	;	~day.text = Middle ( ~dateText ; ~day.pos0 ; ~day.length )
-	;	~day.value = Day ( Date ( 1 ; ~day.text ; 2017 ) )
-	]
-	;	~day.value
-	)
+;   ~dayValue = Let (
+    [   ~day.pos0 = Position ( ~formatText ; "y" ; 0 ; 1 )
+    ;   ~day.length = ~countDayDigits
+    ;   ~day.text = Middle ( ~dateText ; ~day.pos0 ; ~day.length )
+    ;   ~day.value = Day ( Date ( 1 ; ~day.text ; 2017 ) )
+    ]
+    ;   ~day.value
+    )
 
-;	~dateValue = Date ( ~monthValue ; ~dayValue ; ~yearValue )
+;   ~dateValue = Date ( ~monthValue ; ~dayValue ; ~yearValue )
 
 ;   ~returnValue = ~dateValue
 ]
