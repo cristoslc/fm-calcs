@@ -1,0 +1,83 @@
+
+/** 
+# sql.whereInList.asList ( fqFieldToReturn ; fqFieldToMatch ; listOfValuesToMatch )
+  - Syntactic sugar for performing a basic SQL query of the 
+    structure `SELECT <<fieldToReturn's field>> FROM <<fieldToReturn's table>> WHERE <<fieldToMatch>> IN ( listOfvaluesToMatch>> )`.
+  - Returns result as a CR-delimited list.
+  - **WARNING:** Use of carriage returns in values of `fqFieldToReturn` may cause unexpected behavior when parsing the resulting list. Consider using `sql.whereInList()` instead.
+  - __NOTE:__ This version only works for text and number fields, and may not return the expected result for Date, Timestamp, or other field types.
+
+
+## PARAMETERS
+### fqFieldToReturn ( field reference )
+ - A FileMaker reference to the field whose value you want returned from the query.
+### fqFieldToMatch ( field reference )
+ - A FileMaker reference to the field whose value should match one of the values in `listOfValuesToMatch`.
+### listOfValuesToMatch ( text|number )
+ - CR-delimited list of the value(s) to look for in fqFieldToMatch
+
+
+## USAGE
+```
+sql.whereInList.asList ( Customers::NameFull ; Customers::idCustomer ; $idlistCustomer )
+```
+- returns a list of the values from `NameFull` for the any Customer records whose `idCustomer` is found in the list `$idlistCustomer` via ExecuteSQL
+
+ 
+## REQUIRES
+ - sql.col.delimiter CF
+ - sql.getField custom function
+ - sql.getTable CF
+
+ 
+## CHANGELOG
+### v1.0 2018-02-07
+ - Created by [Cristos Lianides-Chin](mailto:cristos@anchorbuoysoftware.com).
+
+**/
+
+
+Let (
+[   null = $null
+;   ~fqFieldToReturn = fqFieldToReturn
+;   ~fqFieldToMatch = fqFieldToMatch
+;   ~listOfValuesToMatch = listOfValuesToMatch
+
+;   ~matchFieldType = Lower ( GetValue 
+	( 	Substitute ( FieldType ( Get ( FileName ) ; GetFieldName ( ~fqFieldToMatch ) ) ; [ " " ; "¶" ] ) 
+	; 2 
+	) )
+
+;   ~isListOfNumbers = GetAsBoolean
+    (    ~matchFieldType = "number"
+    )
+
+;   ~csvlistOfValues = Case 
+    (   ~isListOfNumbers
+    ;       Substitute ( ~listOfValuesToMatch ; "¶" ; "," )
+    /** ELSE **/
+    ;       "'" & Substitute ( ~listOfValuesToMatch ; "¶" ; "' , '" ) & "'"
+    )
+
+;   ~sqlQuery = List
+    (   "SELECT " & sql.getField ( ~fqFieldToReturn )
+    ;   "FROM " & sql.getTable ( ~fqFieldToReturn )
+    ;   "WHERE " & sql.getField ( ~fqFieldToMatch ) & " IN ( " & ~csvlistOfValues & " ) "
+    )
+
+;   ~utcStart = Get ( CurrentTimeUTCMilliseconds )
+/**
+;   ~sqlExec = ExecuteSQL
+    (   ~sqlQuery
+    ;   sql.col.delimiter ; "¶"
+    )
+**/
+;   ~utcStop = Get ( CurrentTimeUTCMilliseconds )
+
+;   ~elapsedMs = ~utcStop - ~utcStart
+
+;   $$~sql.whereEquals__elapsedMs = ~elapsedMs
+
+]
+;   sql.debug ( ~sqlExec )
+)
